@@ -9,7 +9,6 @@ from aquaclean.domain.entities import Actor, digest
 from aquaclean.domain.errors import DomainError
 from aquaclean.domain.policies import (
     validate_action,
-    validate_commercial_exception,
     validate_fulfillment,
     validate_request,
 )
