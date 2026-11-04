@@ -1,3 +1,5 @@
+> Documento histórico de implementación corporativa V1. Para el alcance vigente al detalle consultar [contratos V2](contratos/DETALLE_V2.md), [arquitectura actual](arquitectura/IMPLEMENTADA.md) y [guía actual](GUIA_PRUEBAS_DETALLADA.md). Original íntegro en antecedentes/v1.
+
 > Guía de diseño original conservada. Los comandos operativos de la aplicación construida están en [README](../README.md); las pruebas reproducibles están en [guía detallada](GUIA_PRUEBAS_DETALLADA.md).
 
 # Cómo construir y demostrar la V1 local de Aqua Clean

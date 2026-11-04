@@ -1,3 +1,5 @@
+> Antecedente V1. Para el alcance vigente al detalle consultar README.md, docs/PLAN_ARQUITECTURA.md, docs/contratos/DETALLE_V2.md y docs/arquitectura/IMPLEMENTADA.md. Se conserva el texto histórico.
+
 # Prompt completo para Codex en VS Code
 
 Copia el texto siguiente en Codex. Antes, coloca los documentos en `docs/diseno/` y el `AGENTS.md` propuesto en la raíz del repositorio, como indica la guía.

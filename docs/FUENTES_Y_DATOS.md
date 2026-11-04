@@ -1,3 +1,9 @@
+# Actualización V2 de fuentes
+
+El corpus activo `knowledge/*.md` contiene procedimientos sintéticos aprobados para el laboratorio al detalle. Se reingirieron 18 fragmentos con Gemini reales de 768 dimensiones el 2026-11-04 y se comprobó consulta vectorial; modelo/dimensión y filtros se conservan. El corpus V1 está en antecedentes/v1/knowledge. Las referencias públicas CPSC no autorizan tratamientos, compensaciones ni cierre y no son historia interna. Las cifras y fechas que siguen son el registro histórico V1, no resultados nuevos.
+
+---
+
 # Procedencia, fechas y separación de datos
 
 Fecha de preparación: **16/10/2026, America/Lima**. La instrucción inicial pedía históricos reales de Aqua Clean; no se proporcionaron registros operativos autorizados. Después se autorizó utilizar datos que parecieran reales. Por ello se entrega un histórico **sintético y explícitamente etiquetado**, junto con referencias públicas auténticas. Ningún registro sintético se presenta como un cliente, empleado, pedido, guía o incidente real de la empresa.
