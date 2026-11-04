@@ -2,6 +2,7 @@ import asyncio
 import math
 
 from google.genai import types
+from langsmith import traceable
 
 from aquaclean.domain.errors import ProviderUnavailable
 from aquaclean.infrastructure.llm.provider import GeminiProvider
@@ -13,6 +14,12 @@ class GeminiEmbeddings:
         self.model = provider.settings.gemini_embedding_model
         self.dimension = provider.settings.embedding_dimension
 
+    @traceable(
+        name="Gemini.embeddings",
+        run_type="embedding",
+        process_inputs=lambda x: {"task": x.get("task"), "count": len(x.get("texts", []))},
+        process_outputs=lambda _: {"vectors": "persisted or queried; omitted"},
+    )
     async def embed(self, texts: list[str], task: str) -> list[list[float]]:
         self.provider.require()
         try:
