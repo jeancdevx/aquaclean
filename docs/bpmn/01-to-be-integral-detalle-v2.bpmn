@@ -1,0 +1,683 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ac="https://aquaclean.example/bpmn/v2" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Def_IntegralDetalle" targetNamespace="https://aquaclean.example/bpmn/v2" exporter="Aqua Clean especificación alineada V2" exporterVersion="2.0">
+  <bpmn:collaboration id="Coll_IntegralDetalle">
+    <bpmn:participant id="Pool_IntegralDetalle" name="Aqua Clean · Gestionar el pedido de lavandería al detalle" processRef="Process_IntegralDetalle"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_IntegralDetalle" name="Gestionar el pedido de lavandería al detalle" isExecutable="false">
+    <bpmn:documentation>TO BE propuesto V2 para lavandería al detalle. No acredita código ejecutado. Personas verifican prendas; IA propone; servicios validan y escriben. Descripciones y condiciones en PLAN_ALINEADO_V2.md y DESCRIPCIONES_TO_BE_V2.md. Parámetros de laboratorio no equivalen a políticas ratificadas.</bpmn:documentation>
+    <bpmn:laneSet id="Lanes_IntegralDetalle">
+      <bpmn:lane id="IntegralDetalle_Lane0" name="Operador y cliente · verificación humana">
+        <bpmn:flowNodeRef>I_S</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Canal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Recoger</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_RecoOk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Recibir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Procesar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Modalidad</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Entregar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Cobrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Pend</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_FinPend</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Timer</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="IntegralDetalle_Lane1" name="Agentes y subprocesos de apoyo">
+        <bpmn:flowNodeRef>I_P1R</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_P1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_P3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_P4</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="IntegralDetalle_Lane2" name="Servicios deterministas y persistencia">
+        <bpmn:flowNodeRef>I_SolOk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_P2R</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_AgReco</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Orden</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Disposicion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Aviso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_P2E</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_AgEnt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Saldo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_CierreOk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Cerrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_Alerta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>I_FinAlerta</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="I_S" name="Solicitud de servicio al detalle">
+      <bpmn:outgoing>IntegralDetalle_F00</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="I_Canal" name="¿Requiere recojo previo?" default="IntegralDetalle_F02">
+      <bpmn:incoming>IntegralDetalle_F00</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F01</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F02</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="I_P1R" name="P1R · Registrar solicitud previa" calledElement="ac:Process_P1R">
+      <bpmn:incoming>IntegralDetalle_F01</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F29</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="I_SolOk" name="¿Solicitud registrada?" default="IntegralDetalle_F31">
+      <bpmn:incoming>IntegralDetalle_F29</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F30</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F31</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="I_P2R" name="P2 · Coordinar recojo por solicitud" calledElement="ac:Process_P2">
+      <bpmn:incoming>IntegralDetalle_F30</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F32</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="I_AgReco" name="¿Recojo reservado?" default="IntegralDetalle_F34">
+      <bpmn:incoming>IntegralDetalle_F32</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F33</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F34</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="I_Recoger" name="Recoger prendas y documentar resultado">
+      <bpmn:incoming>IntegralDetalle_F33</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F03</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="I_RecoOk" name="¿Recojo realizado?" default="IntegralDetalle_F05">
+      <bpmn:incoming>IntegralDetalle_F03</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F04</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="I_Recibir" name="Recibir prendas efectivamente">
+      <bpmn:incoming>IntegralDetalle_F02</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F04</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F06</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:callActivity id="I_P1" name="P1 · Recepción y orden al detalle" calledElement="ac:Process_P1">
+      <bpmn:incoming>IntegralDetalle_F06</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F07</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="I_Orden" name="¿Orden RECEIVED confirmada?" default="IntegralDetalle_F09">
+      <bpmn:incoming>IntegralDetalle_F07</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F08</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="I_Procesar" name="Iniciar y completar lavado secado planchado">
+      <bpmn:incoming>IntegralDetalle_F08</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F10</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:callActivity id="I_P3" name="P3 · Calidad y verificación física" calledElement="ac:Process_P3">
+      <bpmn:incoming>IntegralDetalle_F10</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F11</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="I_Disposicion" name="¿Disposición registrada?" default="IntegralDetalle_F14">
+      <bpmn:incoming>IntegralDetalle_F11</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F12</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F13</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="I_P4" name="P4 · Investigar incidencia vinculada" calledElement="ac:Process_P4">
+      <bpmn:incoming>IntegralDetalle_F13</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F15</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sendTask id="I_Aviso" name="Avisar prendas listas por outbox local">
+      <bpmn:incoming>IntegralDetalle_F12</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F16</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:exclusiveGateway id="I_Modalidad" name="¿Entrega a domicilio?" default="IntegralDetalle_F18">
+      <bpmn:incoming>IntegralDetalle_F16</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F17</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:callActivity id="I_P2E" name="P2 · Coordinar entrega de orden READY" calledElement="ac:Process_P2">
+      <bpmn:incoming>IntegralDetalle_F17</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F35</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="I_AgEnt" name="¿Entrega reservada?" default="IntegralDetalle_F37">
+      <bpmn:incoming>IntegralDetalle_F35</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F36</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F37</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="I_Entregar" name="Registrar entrega receptor y conformidad">
+      <bpmn:incoming>IntegralDetalle_F18</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F36</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:businessRuleTask id="I_Saldo" name="Calcular saldo con registros de cobro">
+      <bpmn:incoming>IntegralDetalle_F19</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F20</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:userTask id="I_Cobrar" name="Registrar cobro declarado o verificar saldo cero">
+      <bpmn:incoming>IntegralDetalle_F20</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F21</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:businessRuleTask id="I_Validar" name="Validar entrega conformidad saldo e incidencias">
+      <bpmn:incoming>IntegralDetalle_F21</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F22</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="I_CierreOk" name="¿Requisitos de cierre cumplidos?" default="IntegralDetalle_F24">
+      <bpmn:incoming>IntegralDetalle_F22</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F23</bpmn:outgoing>
+      <bpmn:outgoing>IntegralDetalle_F24</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="I_Cerrar" name="Emitir comprobante demo y cerrar orden">
+      <bpmn:incoming>IntegralDetalle_F23</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F25</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="I_Fin" name="Pedido entregado conforme y cobrado">
+      <bpmn:incoming>IntegralDetalle_F25</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="I_Pend" name="Gestionar pendiente o reprogramación explícita">
+      <bpmn:incoming>IntegralDetalle_F05</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F09</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F14</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F15</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F24</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F31</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F34</bpmn:incoming>
+      <bpmn:incoming>IntegralDetalle_F37</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F26</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="I_FinPend" name="Pendiente con responsable">
+      <bpmn:incoming>IntegralDetalle_F26</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:boundaryEvent id="I_Timer" name="24 h sin completar procesamiento" attachedToRef="I_Procesar" cancelActivity="false">
+      <bpmn:outgoing>IntegralDetalle_F27</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="I_Timer_Def">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sendTask id="I_Alerta" name="Alertar retraso sin detener procesamiento">
+      <bpmn:incoming>IntegralDetalle_F27</bpmn:incoming>
+      <bpmn:outgoing>IntegralDetalle_F28</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="I_FinAlerta" name="Alerta registrada">
+      <bpmn:incoming>IntegralDetalle_F28</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="IntegralDetalle_F00" sourceRef="I_S" targetRef="I_Canal"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F01" sourceRef="I_Canal" targetRef="I_P1R" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">canal_recojo</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F02" sourceRef="I_Canal" targetRef="I_Recibir" name="Mostrador"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F03" sourceRef="I_Recoger" targetRef="I_RecoOk"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F04" sourceRef="I_RecoOk" targetRef="I_Recibir" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">recojo_realizado</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F05" sourceRef="I_RecoOk" targetRef="I_Pend" name="No"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F06" sourceRef="I_Recibir" targetRef="I_P1"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F07" sourceRef="I_P1" targetRef="I_Orden"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F08" sourceRef="I_Orden" targetRef="I_Procesar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">orden_received</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F09" sourceRef="I_Orden" targetRef="I_Pend" name="No"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F10" sourceRef="I_Procesar" targetRef="I_P3"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F11" sourceRef="I_P3" targetRef="I_Disposicion"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F12" sourceRef="I_Disposicion" targetRef="I_Aviso" name="Lista">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">estado == READY</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F13" sourceRef="I_Disposicion" targetRef="I_P4" name="Incidencia">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">incidencia_abierta</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F14" sourceRef="I_Disposicion" targetRef="I_Pend" name="Pendiente"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F15" sourceRef="I_P4" targetRef="I_Pend"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F16" sourceRef="I_Aviso" targetRef="I_Modalidad"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F17" sourceRef="I_Modalidad" targetRef="I_P2E" name="Domicilio">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">entrega_domicilio</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F18" sourceRef="I_Modalidad" targetRef="I_Entregar" name="Mostrador"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F19" sourceRef="I_Entregar" targetRef="I_Saldo"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F20" sourceRef="I_Saldo" targetRef="I_Cobrar"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F21" sourceRef="I_Cobrar" targetRef="I_Validar"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F22" sourceRef="I_Validar" targetRef="I_CierreOk"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F23" sourceRef="I_CierreOk" targetRef="I_Cerrar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">entregado and conformidad and saldo == 0 and not incidencia_bloqueante</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F24" sourceRef="I_CierreOk" targetRef="I_Pend" name="No"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F25" sourceRef="I_Cerrar" targetRef="I_Fin"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F26" sourceRef="I_Pend" targetRef="I_FinPend"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F27" sourceRef="I_Timer" targetRef="I_Alerta"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F28" sourceRef="I_Alerta" targetRef="I_FinAlerta"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F29" sourceRef="I_P1R" targetRef="I_SolOk"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F30" sourceRef="I_SolOk" targetRef="I_P2R" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">solicitud_registrada</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F31" sourceRef="I_SolOk" targetRef="I_Pend" name="No"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F32" sourceRef="I_P2R" targetRef="I_AgReco"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F33" sourceRef="I_AgReco" targetRef="I_Recoger" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">reserva_recojo_confirmada</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F34" sourceRef="I_AgReco" targetRef="I_Pend" name="No"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F35" sourceRef="I_P2E" targetRef="I_AgEnt"/>
+    <bpmn:sequenceFlow id="IntegralDetalle_F36" sourceRef="I_AgEnt" targetRef="I_Entregar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">reserva_entrega_confirmada</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="IntegralDetalle_F37" sourceRef="I_AgEnt" targetRef="I_Pend" name="No"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_IntegralDetalle">
+    <bpmndi:BPMNPlane id="Plane_IntegralDetalle" bpmnElement="Coll_IntegralDetalle">
+      <bpmndi:BPMNShape id="Pool_IntegralDetalle_DI" bpmnElement="Pool_IntegralDetalle" isHorizontal="true">
+        <dc:Bounds x="40" y="100" width="6100" height="1090"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntegralDetalle_Lane0_DI" bpmnElement="IntegralDetalle_Lane0" isHorizontal="true">
+        <dc:Bounds x="70" y="100" width="6070" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntegralDetalle_Lane1_DI" bpmnElement="IntegralDetalle_Lane1" isHorizontal="true">
+        <dc:Bounds x="70" y="350" width="6070" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntegralDetalle_Lane2_DI" bpmnElement="IntegralDetalle_Lane2" isHorizontal="true">
+        <dc:Bounds x="70" y="600" width="6070" height="590"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_S_DI" bpmnElement="I_S" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="130" y="204.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="95" y="248.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Canal_DI" bpmnElement="I_Canal" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="320" y="197.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="285" y="255.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_P1R_DI" bpmnElement="I_P1R" isExpanded="false" bioc:fill="#DBEAFE" bioc:stroke="#334155">
+        <dc:Bounds x="510" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_SolOk_DI" bpmnElement="I_SolOk" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="700" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="665" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_P2R_DI" bpmnElement="I_P2R" isExpanded="false" bioc:fill="#DBEAFE" bioc:stroke="#334155">
+        <dc:Bounds x="890" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_AgReco_DI" bpmnElement="I_AgReco" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="1080" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1045" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Recoger_DI" bpmnElement="I_Recoger" bioc:fill="#F1F5F9" bioc:stroke="#334155">
+        <dc:Bounds x="1270" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_RecoOk_DI" bpmnElement="I_RecoOk" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="1460" y="197.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1425" y="255.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Recibir_DI" bpmnElement="I_Recibir" bioc:fill="#F1F5F9" bioc:stroke="#334155">
+        <dc:Bounds x="1650" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_P1_DI" bpmnElement="I_P1" isExpanded="false" bioc:fill="#DBEAFE" bioc:stroke="#334155">
+        <dc:Bounds x="1840" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Orden_DI" bpmnElement="I_Orden" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="2030" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1995" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Procesar_DI" bpmnElement="I_Procesar" bioc:fill="#F1F5F9" bioc:stroke="#334155">
+        <dc:Bounds x="2220" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_P3_DI" bpmnElement="I_P3" isExpanded="false" bioc:fill="#DBEAFE" bioc:stroke="#334155">
+        <dc:Bounds x="2410" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Disposicion_DI" bpmnElement="I_Disposicion" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="2600" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2565" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_P4_DI" bpmnElement="I_P4" isExpanded="false" bioc:fill="#DBEAFE" bioc:stroke="#334155">
+        <dc:Bounds x="2790" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Aviso_DI" bpmnElement="I_Aviso" bioc:fill="#DCFCE7" bioc:stroke="#334155">
+        <dc:Bounds x="2980" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Modalidad_DI" bpmnElement="I_Modalidad" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="3170" y="197.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3135" y="255.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_P2E_DI" bpmnElement="I_P2E" isExpanded="false" bioc:fill="#DBEAFE" bioc:stroke="#334155">
+        <dc:Bounds x="3360" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_AgEnt_DI" bpmnElement="I_AgEnt" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="3550" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3515" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Entregar_DI" bpmnElement="I_Entregar" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="3740" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Saldo_DI" bpmnElement="I_Saldo" bioc:fill="#E0F2FE" bioc:stroke="#334155">
+        <dc:Bounds x="3930" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Cobrar_DI" bpmnElement="I_Cobrar" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="4120" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Validar_DI" bpmnElement="I_Validar" bioc:fill="#E0F2FE" bioc:stroke="#334155">
+        <dc:Bounds x="4310" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_CierreOk_DI" bpmnElement="I_CierreOk" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="4500" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4465" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Cerrar_DI" bpmnElement="I_Cerrar" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="4690" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Fin_DI" bpmnElement="I_Fin" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="4880" y="704.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4845" y="748.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Pend_DI" bpmnElement="I_Pend" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="5070" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_FinPend_DI" bpmnElement="I_FinPend" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="5260" y="204.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5225" y="248.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Timer_DI" bpmnElement="I_Timer" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="2350" y="246.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2315" y="290.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_Alerta_DI" bpmnElement="I_Alerta" bioc:fill="#DCFCE7" bioc:stroke="#334155">
+        <dc:Bounds x="5640" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="I_FinAlerta_DI" bpmnElement="I_FinAlerta" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="5830" y="704.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="5795" y="748.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F00_DI" bpmnElement="IntegralDetalle_F00">
+        <di:waypoint x="166" y="222.0"/>
+        <di:waypoint x="243.0" y="222.0"/>
+        <di:waypoint x="243.0" y="222.0"/>
+        <di:waypoint x="320" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F01_DI" bpmnElement="IntegralDetalle_F01">
+        <di:waypoint x="370" y="222.0"/>
+        <di:waypoint x="440.0" y="222.0"/>
+        <di:waypoint x="440.0" y="472.0"/>
+        <di:waypoint x="510" y="472.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="443.0" y="225.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F02_DI" bpmnElement="IntegralDetalle_F02">
+        <di:waypoint x="345.0" y="247.0"/>
+        <di:waypoint x="345.0" y="894"/>
+        <di:waypoint x="1725.0" y="894"/>
+        <di:waypoint x="1725.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="348.0" y="897" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F03_DI" bpmnElement="IntegralDetalle_F03">
+        <di:waypoint x="1420" y="222.0"/>
+        <di:waypoint x="1440.0" y="222.0"/>
+        <di:waypoint x="1440.0" y="222.0"/>
+        <di:waypoint x="1460" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F04_DI" bpmnElement="IntegralDetalle_F04">
+        <di:waypoint x="1510" y="222.0"/>
+        <di:waypoint x="1580.0" y="222.0"/>
+        <di:waypoint x="1580.0" y="222.0"/>
+        <di:waypoint x="1650" y="222.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1583.0" y="225.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F05_DI" bpmnElement="IntegralDetalle_F05">
+        <di:waypoint x="1485.0" y="247.0"/>
+        <di:waypoint x="1485.0" y="915"/>
+        <di:waypoint x="5145.0" y="915"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1488.0" y="918" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F06_DI" bpmnElement="IntegralDetalle_F06">
+        <di:waypoint x="1800" y="222.0"/>
+        <di:waypoint x="1820.0" y="222.0"/>
+        <di:waypoint x="1820.0" y="472.0"/>
+        <di:waypoint x="1840" y="472.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F07_DI" bpmnElement="IntegralDetalle_F07">
+        <di:waypoint x="1990" y="472.0"/>
+        <di:waypoint x="2010.0" y="472.0"/>
+        <di:waypoint x="2010.0" y="722.0"/>
+        <di:waypoint x="2030" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F08_DI" bpmnElement="IntegralDetalle_F08">
+        <di:waypoint x="2080" y="722.0"/>
+        <di:waypoint x="2150.0" y="722.0"/>
+        <di:waypoint x="2150.0" y="222.0"/>
+        <di:waypoint x="2220" y="222.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2153.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F09_DI" bpmnElement="IntegralDetalle_F09">
+        <di:waypoint x="2055.0" y="747.0"/>
+        <di:waypoint x="2055.0" y="943"/>
+        <di:waypoint x="5145.0" y="943"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2058.0" y="946" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F10_DI" bpmnElement="IntegralDetalle_F10">
+        <di:waypoint x="2370" y="222.0"/>
+        <di:waypoint x="2390.0" y="222.0"/>
+        <di:waypoint x="2390.0" y="472.0"/>
+        <di:waypoint x="2410" y="472.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F11_DI" bpmnElement="IntegralDetalle_F11">
+        <di:waypoint x="2560" y="472.0"/>
+        <di:waypoint x="2580.0" y="472.0"/>
+        <di:waypoint x="2580.0" y="722.0"/>
+        <di:waypoint x="2600" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F12_DI" bpmnElement="IntegralDetalle_F12">
+        <di:waypoint x="2625.0" y="747.0"/>
+        <di:waypoint x="2625.0" y="964"/>
+        <di:waypoint x="3055.0" y="964"/>
+        <di:waypoint x="3055.0" y="764.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2628.0" y="967" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F13_DI" bpmnElement="IntegralDetalle_F13">
+        <di:waypoint x="2650" y="722.0"/>
+        <di:waypoint x="2720.0" y="722.0"/>
+        <di:waypoint x="2720.0" y="472.0"/>
+        <di:waypoint x="2790" y="472.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2723.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F14_DI" bpmnElement="IntegralDetalle_F14">
+        <di:waypoint x="2625.0" y="747.0"/>
+        <di:waypoint x="2625.0" y="978"/>
+        <di:waypoint x="5145.0" y="978"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2628.0" y="981" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F15_DI" bpmnElement="IntegralDetalle_F15">
+        <di:waypoint x="2865.0" y="514.0"/>
+        <di:waypoint x="2865.0" y="985"/>
+        <di:waypoint x="5145.0" y="985"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F16_DI" bpmnElement="IntegralDetalle_F16">
+        <di:waypoint x="3130" y="722.0"/>
+        <di:waypoint x="3150.0" y="722.0"/>
+        <di:waypoint x="3150.0" y="222.0"/>
+        <di:waypoint x="3170" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F17_DI" bpmnElement="IntegralDetalle_F17">
+        <di:waypoint x="3220" y="222.0"/>
+        <di:waypoint x="3290.0" y="222.0"/>
+        <di:waypoint x="3290.0" y="722.0"/>
+        <di:waypoint x="3360" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3293.0" y="225.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F18_DI" bpmnElement="IntegralDetalle_F18">
+        <di:waypoint x="3195.0" y="247.0"/>
+        <di:waypoint x="3195.0" y="1006"/>
+        <di:waypoint x="3815.0" y="1006"/>
+        <di:waypoint x="3815.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3198.0" y="1009" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F19_DI" bpmnElement="IntegralDetalle_F19">
+        <di:waypoint x="3890" y="222.0"/>
+        <di:waypoint x="3910.0" y="222.0"/>
+        <di:waypoint x="3910.0" y="722.0"/>
+        <di:waypoint x="3930" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F20_DI" bpmnElement="IntegralDetalle_F20">
+        <di:waypoint x="4080" y="722.0"/>
+        <di:waypoint x="4100.0" y="722.0"/>
+        <di:waypoint x="4100.0" y="222.0"/>
+        <di:waypoint x="4120" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F21_DI" bpmnElement="IntegralDetalle_F21">
+        <di:waypoint x="4270" y="222.0"/>
+        <di:waypoint x="4290.0" y="222.0"/>
+        <di:waypoint x="4290.0" y="722.0"/>
+        <di:waypoint x="4310" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F22_DI" bpmnElement="IntegralDetalle_F22">
+        <di:waypoint x="4460" y="722.0"/>
+        <di:waypoint x="4480.0" y="722.0"/>
+        <di:waypoint x="4480.0" y="722.0"/>
+        <di:waypoint x="4500" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F23_DI" bpmnElement="IntegralDetalle_F23">
+        <di:waypoint x="4550" y="722.0"/>
+        <di:waypoint x="4620.0" y="722.0"/>
+        <di:waypoint x="4620.0" y="722.0"/>
+        <di:waypoint x="4690" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4623.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F24_DI" bpmnElement="IntegralDetalle_F24">
+        <di:waypoint x="4525.0" y="747.0"/>
+        <di:waypoint x="4525.0" y="1048"/>
+        <di:waypoint x="5145.0" y="1048"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4528.0" y="1051" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F25_DI" bpmnElement="IntegralDetalle_F25">
+        <di:waypoint x="4840" y="722.0"/>
+        <di:waypoint x="4860.0" y="722.0"/>
+        <di:waypoint x="4860.0" y="722.0"/>
+        <di:waypoint x="4880" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F26_DI" bpmnElement="IntegralDetalle_F26">
+        <di:waypoint x="5220" y="222.0"/>
+        <di:waypoint x="5240.0" y="222.0"/>
+        <di:waypoint x="5240.0" y="222.0"/>
+        <di:waypoint x="5260" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F27_DI" bpmnElement="IntegralDetalle_F27">
+        <di:waypoint x="2368.0" y="282.0"/>
+        <di:waypoint x="2368.0" y="1069"/>
+        <di:waypoint x="5715.0" y="1069"/>
+        <di:waypoint x="5715.0" y="764.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F28_DI" bpmnElement="IntegralDetalle_F28">
+        <di:waypoint x="5790" y="722.0"/>
+        <di:waypoint x="5810.0" y="722.0"/>
+        <di:waypoint x="5810.0" y="722.0"/>
+        <di:waypoint x="5830" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F29_DI" bpmnElement="IntegralDetalle_F29">
+        <di:waypoint x="660" y="472.0"/>
+        <di:waypoint x="680.0" y="472.0"/>
+        <di:waypoint x="680.0" y="722.0"/>
+        <di:waypoint x="700" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F30_DI" bpmnElement="IntegralDetalle_F30">
+        <di:waypoint x="750" y="722.0"/>
+        <di:waypoint x="820.0" y="722.0"/>
+        <di:waypoint x="820.0" y="722.0"/>
+        <di:waypoint x="890" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="823.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F31_DI" bpmnElement="IntegralDetalle_F31">
+        <di:waypoint x="725.0" y="747.0"/>
+        <di:waypoint x="725.0" y="1097"/>
+        <di:waypoint x="5145.0" y="1097"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="728.0" y="1100" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F32_DI" bpmnElement="IntegralDetalle_F32">
+        <di:waypoint x="1040" y="722.0"/>
+        <di:waypoint x="1060.0" y="722.0"/>
+        <di:waypoint x="1060.0" y="722.0"/>
+        <di:waypoint x="1080" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F33_DI" bpmnElement="IntegralDetalle_F33">
+        <di:waypoint x="1130" y="722.0"/>
+        <di:waypoint x="1200.0" y="722.0"/>
+        <di:waypoint x="1200.0" y="222.0"/>
+        <di:waypoint x="1270" y="222.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1203.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F34_DI" bpmnElement="IntegralDetalle_F34">
+        <di:waypoint x="1105.0" y="747.0"/>
+        <di:waypoint x="1105.0" y="1118"/>
+        <di:waypoint x="5145.0" y="1118"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1108.0" y="1121" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F35_DI" bpmnElement="IntegralDetalle_F35">
+        <di:waypoint x="3510" y="722.0"/>
+        <di:waypoint x="3530.0" y="722.0"/>
+        <di:waypoint x="3530.0" y="722.0"/>
+        <di:waypoint x="3550" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F36_DI" bpmnElement="IntegralDetalle_F36">
+        <di:waypoint x="3600" y="722.0"/>
+        <di:waypoint x="3670.0" y="722.0"/>
+        <di:waypoint x="3670.0" y="222.0"/>
+        <di:waypoint x="3740" y="222.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3673.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="IntegralDetalle_F37_DI" bpmnElement="IntegralDetalle_F37">
+        <di:waypoint x="3575.0" y="747.0"/>
+        <di:waypoint x="3575.0" y="1139"/>
+        <di:waypoint x="5145.0" y="1139"/>
+        <di:waypoint x="5145.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3578.0" y="1142" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
