@@ -15,6 +15,7 @@ from aquaclean.domain.entities import Actor
 from aquaclean.domain.errors import DomainError
 from aquaclean.interfaces.api.auth import actor, same_origin
 from aquaclean.interfaces.api.limits import UploadLimitMiddleware
+from aquaclean.interfaces.api.retail_routes import router as retail_router
 from aquaclean.interfaces.api.schemas import (
     NewCase,
     NewRun,
@@ -41,6 +42,7 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url=None,
 )
+app.include_router(retail_router)
 app.add_middleware(
     TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "testserver", "api"]
 )
@@ -69,7 +71,7 @@ async def ready(request: Request):
         row = await rt.repo.db.one(
             "SELECT (SELECT max(version) FROM app.schema_version) version, EXISTS(SELECT 1 FROM pg_extension WHERE extname='vector') vector, to_regclass('checkpoints.checkpoints') IS NOT NULL checkpoints"
         )
-        if not row or row["version"] < 4 or not row["vector"] or not row["checkpoints"]:
+        if not row or row["version"] < 6 or not row["vector"] or not row["checkpoints"]:
             raise ValueError("schema")
         return {
             "status": "ready",
