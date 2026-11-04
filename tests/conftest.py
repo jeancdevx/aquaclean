@@ -36,11 +36,21 @@ async def rt(tmp_path, clock):
     if not url.split("?")[0].endswith("_test"):
         pytest.fail("La base de pruebas debe terminar en _test; no se utiliza la base demo")
     settings = Settings(
-        database_url=SecretStr(url), gemini_api_key=SecretStr(""), media_root=tmp_path
+        database_url=SecretStr(url),
+        gemini_api_key=SecretStr(""),
+        media_root=tmp_path,
+        max_model_calls=24,
     )
     db = Database(settings)
     await db.open()
     await db.migrate()
+    # This fixture has already enforced the explicit _test URL. Retain all data,
+    # but cancel unfinished synthetic jobs left by previous test invocations.
+    # No runtime worker consumes this isolated test database.
+    await db.execute(
+        "UPDATE app.runs SET status='cancelled',cancelled=true,finished_at=now() WHERE organization_id=%s AND status IN ('queued','running')",
+        (ORG,),
+    )
     from aquaclean.infrastructure.persistence.checkpointer import checkpointer
 
     async with checkpointer(settings, setup=True):
@@ -74,6 +84,10 @@ async def rt(tmp_path, clock):
     try:
         yield runtime
     finally:
+        await db.execute(
+            "UPDATE app.runs SET status='cancelled',cancelled=true,finished_at=now() WHERE organization_id=%s AND status IN ('queued','running')",
+            (ORG,),
+        )
         await db.close()
 
 
