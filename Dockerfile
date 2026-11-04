@@ -18,6 +18,7 @@ COPY src ./src
 RUN uv sync --frozen --no-dev
 COPY migrations ./migrations
 COPY knowledge ./knowledge
+COPY config ./config
 COPY reference_data ./reference_data
 COPY --from=web /build/web/dist ./web/dist
 RUN useradd --uid 10001 --create-home app && mkdir -p /data/media && chown -R app:app /data /app
