@@ -8,7 +8,7 @@ from aquaclean.domain.errors import DomainError
 REQUIRED = ("cliente_id", "solicitante", "correo", "fecha_recojo", "turno", "tipo_ropa", "bolsas")
 ROLES = {"P1": "attention", "P2": "logistics", "P3": "quality", "P4": "admin"}
 ACTIONS = {
-    "P1": frozenset({"register", "cancel", "clarify", "answer"}),
+    "P1": frozenset({"register", "receive", "request_pickup", "cancel", "clarify", "answer"}),
     "P2": frozenset({"reserve", "cancel", "clarify", "answer"}),
     "P3": frozenset({"release", "reprocess", "open_incident", "clarify", "answer"}),
     "P4": frozenset({"resolve_incident", "close_incident", "clarify", "answer"}),
