@@ -20,6 +20,9 @@ async def bootstrap(settings: Settings | None = None):
         raise RuntimeError(
             "Solo está implementado AUTH_MODE=demo_local. El perfil autenticado requiere otro adaptador."
         )
+    from aquaclean.infrastructure.observability.tracing import configure
+
+    configure(settings)
     db = Database(settings)
     await db.open()
     clock = LimaClock()
@@ -54,6 +57,7 @@ async def bootstrap(settings: Settings | None = None):
                 settings.max_pickup_days,
                 settings.max_reprocesses,
                 shift_times,
+                settings.retail_tariff_path,
             )
         ),
     )
