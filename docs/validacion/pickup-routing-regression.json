@@ -1,0 +1,87 @@
+{
+  "checked_at": "2026-10-16T23:32:01.005519-05:00",
+  "synthetic": true,
+  "provider": "Gemini real",
+  "scenarios": [
+    {
+      "scenario": "same_case_after_original_order_required_error",
+      "case_id": "778bd0ac-0b65-435e-9024-e37f197ad032",
+      "run_id": "daf1eb80-c9da-4e20-8a24-86e8e9401935",
+      "previous_run_status": "failed",
+      "process": "P1",
+      "status": "awaiting_information",
+      "response": "Para programar el recojo, necesitamos recopilar y verificar los siguientes datos obligatorios: el nombre del solicitante, el correo de contacto, la fecha exacta de recojo, el turno (mañana o tarde), el tipo de ropa (mantelería, toallas, uniformes o mixto) y la cantidad de bolsas. Por favor, indíquenos estos detalles para avanzar con su solicitud.",
+      "missing_fields": [
+        "solicitante",
+        "correo",
+        "fecha_recojo",
+        "turno",
+        "tipo_ropa",
+        "bolsas"
+      ],
+      "orders": 0,
+      "approvals": 0,
+      "routing": [
+        {
+          "agent": "supervisor",
+          "model": "gemini-3.5-flash-lite",
+          "usage": {
+            "model": "gemini-3.5-flash-lite",
+            "tokens": {
+              "input_tokens": 1481,
+              "total_tokens": 1560,
+              "output_tokens": 79,
+              "input_token_details": {
+                "cache_read": 0
+              }
+            },
+            "cost_usd": null,
+            "model_calls": 1
+          },
+          "duration_ms": 2490,
+          "prompt_version": "aquaclean-boundaries-1.1",
+          "proposed_agent": "P1",
+          "selected_agent": "P1",
+          "rationale_summary": "El usuario solicita programar un recojo y revisar los datos necesarios para ello. Como el caso no cuenta con un order_id asociado, la solicitud corresponde al proceso P1 para la recopilación de datos y registro inicial de la solicitud."
+        }
+      ]
+    },
+    {
+      "scenario": "existing_delivery_without_link",
+      "case_id": "e38d6d79-9276-4b66-82a4-549db92bf1ba",
+      "run_id": "06906d3b-9044-4de1-b834-ffdd3563da8f",
+      "previous_run_status": null,
+      "process": "P1",
+      "status": "open",
+      "response": "Para modificar o reprogramar un pedido existente que aún no está vinculado en este caso, por favor abre tu conversación correspondiente o vincula el pedido verificado desde Actividad > Caso > Vincular pedido verificado. No es posible crear un registro nuevo para sustituir un pedido ya existente.",
+      "missing_fields": null,
+      "orders": 0,
+      "approvals": 0,
+      "routing": [
+        {
+          "agent": "supervisor",
+          "model": "gemini-3.5-flash-lite",
+          "usage": {
+            "model": "gemini-3.5-flash-lite",
+            "tokens": {
+              "input_tokens": 1166,
+              "total_tokens": 1228,
+              "output_tokens": 62,
+              "input_token_details": {
+                "cache_read": 0
+              }
+            },
+            "cost_usd": null,
+            "model_calls": 1
+          },
+          "duration_ms": 1061,
+          "prompt_version": "aquaclean-boundaries-1.1",
+          "proposed_agent": "P1",
+          "selected_agent": "P1",
+          "rationale_summary": "El usuario solicita reprogramar un pedido pero el caso no cuenta con un order_id vinculado, por lo que debe clasificarse en P1 para recopilar datos o vincular el pedido existente."
+        }
+      ]
+    }
+  ],
+  "result": "passed"
+}

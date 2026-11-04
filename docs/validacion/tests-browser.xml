@@ -1,0 +1,20 @@
+<testsuites id="" name="" tests="8" failures="0" skipped="0" errors="0" time="24.587735000000002">
+<testsuite name="chat.spec.ts" timestamp="2026-10-17T04:35:11.141Z" hostname="" tests="8" failures="0" skipped="0" time="22.854" errors="0">
+<testcase name="U01 U02 U08 · chat, sugerencias, teclado y temas a 360px" classname="chat.spec.ts" time="1.403">
+</testcase>
+<testcase name="U01 U02 U08 · chat, sugerencias, teclado y temas a 768px" classname="chat.spec.ts" time="1.781">
+</testcase>
+<testcase name="U01 U02 U08 · chat, sugerencias, teclado y temas a 1440px" classname="chat.spec.ts" time="1.683">
+</testcase>
+<testcase name="U04 · subida real, previsualización y archivo inválido" classname="chat.spec.ts" time="1.03">
+</testcase>
+<testcase name="U06 U09 · fuentes oficiales y recursos locales servidos por FastAPI" classname="chat.spec.ts" time="1.364">
+</testcase>
+<testcase name="U08 · contraste WCAG de tokens claros y oscuros" classname="chat.spec.ts" time="0.538">
+</testcase>
+<testcase name="U10 · fixture visual explícito de sesión sin clave" classname="chat.spec.ts" time="0.488">
+</testcase>
+<testcase name="U02 U03 U05 U07 · sugerencia de recojo enviada, P1 Gemini real y confirmación" classname="chat.spec.ts" time="14.567">
+</testcase>
+</testsuite>
+</testsuites>

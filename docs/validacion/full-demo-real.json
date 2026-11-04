@@ -1,0 +1,68 @@
+{
+  "synthetic": true,
+  "provider": "real Gemini configured in backend",
+  "steps": [
+    {
+      "process": "P1",
+      "case_id": "1693f4e0-ebb6-4d42-9f76-0ce3d26c6952",
+      "status": "registered",
+      "orders": [
+        "DEMO-28CA13D45D"
+      ],
+      "source_ids": [
+        "demo:p1-pedidos:a44e84e1d47828aaa8a874ba:2"
+      ]
+    },
+    {
+      "process": "P2",
+      "case_id": "1693f4e0-ebb6-4d42-9f76-0ce3d26c6952",
+      "status": "scheduled",
+      "orders": [
+        "DEMO-28CA13D45D"
+      ],
+      "source_ids": [
+        "demo:p2-agenda:a44e84e1d47828aaa8a874ba:2",
+        "demo:p1-pedidos:a44e84e1d47828aaa8a874ba:2"
+      ]
+    },
+    {
+      "process": "P3",
+      "case_id": "a13957e9-36b5-4c60-a9d5-1882dbd6ee62",
+      "status": "released",
+      "orders": [
+        "DEMO-28CA13D45D"
+      ],
+      "source_ids": [
+        "demo:p3-calidad:a44e84e1d47828aaa8a874ba:2"
+      ]
+    },
+    {
+      "process": "P4-plan",
+      "case_id": "8f9734ae-4256-41bb-8ee2-7e156a2c5894",
+      "status": "awaiting_customer_acceptance_and_fulfillment",
+      "orders": [
+        "DEMO-28CA13D45D"
+      ],
+      "source_ids": [
+        "demo:p4-incidencias:a44e84e1d47828aaa8a874ba:0",
+        "demo:p4-incidencias:a44e84e1d47828aaa8a874ba:2"
+      ]
+    },
+    {
+      "process": "P4-cierre",
+      "case_id": "8f9734ae-4256-41bb-8ee2-7e156a2c5894",
+      "status": "closed",
+      "orders": [
+        "DEMO-28CA13D45D"
+      ],
+      "source_ids": [
+        "demo:p4-incidencias:a44e84e1d47828aaa8a874ba:0",
+        "demo:p4-incidencias:a44e84e1d47828aaa8a874ba:2"
+      ]
+    }
+  ],
+  "restart_pending_approval_verified": true,
+  "attachment_persistence_verified": true,
+  "attachment_sha256": "2f95059d670a8751daad507d6f14078b2c38fa4b6c7b95bb4f3e1d06c7afe6bf",
+  "status": "passed"
+}

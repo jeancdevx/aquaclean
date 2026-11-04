@@ -1,0 +1,2891 @@
+[
+  {
+    "code": "P1",
+    "filename": "02-to-be-solicitudes.bpmn",
+    "process_id": "Process_P1",
+    "title": "P1 · Interpretar y registrar solicitudes de recojo",
+    "nodes": [
+      {
+        "id": "P1_S",
+        "short": "S",
+        "kind": "startEvent",
+        "label": "Solicitud en lenguaje natural",
+        "lane": 0,
+        "col": 0,
+        "row": 0,
+        "doc": "",
+        "event": "message"
+      },
+      {
+        "id": "P1_Interpretar",
+        "short": "Interpretar",
+        "kind": "serviceTask",
+        "label": "Interpretar intención y extraer campos",
+        "lane": 0,
+        "col": 1,
+        "row": 0,
+        "doc": "Agente de atención. Extracción con evidencia textual. Nunca completa datos no confirmados."
+      },
+      {
+        "id": "P1_Consultar",
+        "short": "Consultar",
+        "kind": "serviceTask",
+        "label": "Consultar identidad y padrón autorizado",
+        "lane": 1,
+        "col": 2,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Datos",
+        "short": "Datos",
+        "kind": "exclusiveGateway",
+        "label": "¿Datos suficientes?",
+        "lane": 0,
+        "col": 3,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Preguntar",
+        "short": "Preguntar",
+        "kind": "sendTask",
+        "label": "Preguntar por el dato ambiguo o faltante",
+        "lane": 0,
+        "col": 4,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P1_Respuesta",
+        "short": "Respuesta",
+        "kind": "receiveTask",
+        "label": "Esperar aclaración del cliente",
+        "lane": 0,
+        "col": 5,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P1_Timeout",
+        "short": "Timeout",
+        "kind": "boundaryEvent",
+        "label": "24 h sin respuesta",
+        "lane": 0,
+        "col": 5,
+        "row": 0,
+        "doc": "",
+        "attach": "Respuesta",
+        "event": "timer",
+        "duration": "PT24H"
+      },
+      {
+        "id": "P1_Resumen",
+        "short": "Resumen",
+        "kind": "sendTask",
+        "label": "Presentar resumen con fecha exacta",
+        "lane": 0,
+        "col": 4,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Confirmar",
+        "short": "Confirmar",
+        "kind": "receiveTask",
+        "label": "Recibir confirmación o corrección",
+        "lane": 0,
+        "col": 5,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Acepta",
+        "short": "Acepta",
+        "kind": "exclusiveGateway",
+        "label": "¿Confirma los datos?",
+        "lane": 0,
+        "col": 6,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Validar",
+        "short": "Validar",
+        "kind": "businessRuleTask",
+        "label": "Validar contrato, permisos y estado comercial",
+        "lane": 1,
+        "col": 7,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Permiso",
+        "short": "Permiso",
+        "kind": "exclusiveGateway",
+        "label": "¿Puede ejecutarse?",
+        "lane": 1,
+        "col": 8,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Humano",
+        "short": "Humano",
+        "kind": "userTask",
+        "label": "Revisar ambigüedad o excepción comercial",
+        "lane": 2,
+        "col": 9,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Autoriza",
+        "short": "Autoriza",
+        "kind": "exclusiveGateway",
+        "label": "¿Autoriza y completa datos?",
+        "lane": 2,
+        "col": 10,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Registrar",
+        "short": "Registrar",
+        "kind": "serviceTask",
+        "label": "Invocar registrar_recojo idempotente",
+        "lane": 1,
+        "col": 11,
+        "row": 0,
+        "doc": "Servicio determinista. Puede usar el adaptador n8n o el servicio Python. El agente no calcula el identificador del pedido."
+      },
+      {
+        "id": "P1_Error",
+        "short": "Error",
+        "kind": "boundaryEvent",
+        "label": "Fallo técnico",
+        "lane": 1,
+        "col": 11,
+        "row": 0,
+        "doc": "",
+        "attach": "Registrar",
+        "event": "error"
+      },
+      {
+        "id": "P1_Resultado",
+        "short": "Resultado",
+        "kind": "exclusiveGateway",
+        "label": "¿Resultado del registro?",
+        "lane": 1,
+        "col": 12,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Informar",
+        "short": "Informar",
+        "kind": "sendTask",
+        "label": "Comunicar el resultado real del servicio",
+        "lane": 0,
+        "col": 13,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Fin",
+        "short": "Fin",
+        "kind": "endEvent",
+        "label": "Solicitud registrada o existente",
+        "lane": 0,
+        "col": 14,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P1_Pendiente",
+        "short": "Pendiente",
+        "kind": "serviceTask",
+        "label": "Guardar caso pendiente y motivo",
+        "lane": 1,
+        "col": 12,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P1_Avisar",
+        "short": "Avisar",
+        "kind": "sendTask",
+        "label": "Informar revisión sin confirmar el recojo",
+        "lane": 0,
+        "col": 13,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P1_FinPend",
+        "short": "FinPend",
+        "kind": "endEvent",
+        "label": "Caso pendiente de atención",
+        "lane": 0,
+        "col": 14,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P1_FinNo",
+        "short": "FinNo",
+        "kind": "endEvent",
+        "label": "Solicitud no autorizada o cancelada",
+        "lane": 2,
+        "col": 12,
+        "row": 0,
+        "doc": ""
+      }
+    ],
+    "flows": [
+      {
+        "id": "P1_F01",
+        "source": "P1_S",
+        "target": "P1_Interpretar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F02",
+        "source": "P1_Interpretar",
+        "target": "P1_Consultar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F03",
+        "source": "P1_Consultar",
+        "target": "P1_Datos",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F04",
+        "source": "P1_Datos",
+        "target": "P1_Resumen",
+        "label": "Completos",
+        "condition": "datos_completos",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F05",
+        "source": "P1_Datos",
+        "target": "P1_Preguntar",
+        "label": "Aclarable (hasta 2 rondas)",
+        "condition": "aclarable and rondas < 2",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F06",
+        "source": "P1_Datos",
+        "target": "P1_Humano",
+        "label": "Identidad no resuelta / límite",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P1_F07",
+        "source": "P1_Preguntar",
+        "target": "P1_Respuesta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F08",
+        "source": "P1_Respuesta",
+        "target": "P1_Interpretar",
+        "label": "Aclaración",
+        "condition": null,
+        "default": false,
+        "track": 315
+      },
+      {
+        "id": "P1_F09",
+        "source": "P1_Timeout",
+        "target": "P1_Pendiente",
+        "label": "Sin respuesta",
+        "condition": null,
+        "default": false,
+        "track": 1060
+      },
+      {
+        "id": "P1_F10",
+        "source": "P1_Resumen",
+        "target": "P1_Confirmar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F11",
+        "source": "P1_Confirmar",
+        "target": "P1_Acepta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F12",
+        "source": "P1_Acepta",
+        "target": "P1_Validar",
+        "label": "Sí",
+        "condition": "datos_confirmados",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F13",
+        "source": "P1_Acepta",
+        "target": "P1_Interpretar",
+        "label": "Corrección (hasta 2 rondas)",
+        "condition": "correccion and rondas < 2",
+        "default": false,
+        "track": 340
+      },
+      {
+        "id": "P1_F14",
+        "source": "P1_Acepta",
+        "target": "P1_Humano",
+        "label": "Límite de corrección",
+        "condition": "correccion and rondas >= 2",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F15",
+        "source": "P1_Acepta",
+        "target": "P1_FinNo",
+        "label": "Cancelación",
+        "condition": null,
+        "default": true,
+        "track": 1078
+      },
+      {
+        "id": "P1_F16",
+        "source": "P1_Validar",
+        "target": "P1_Permiso",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F17",
+        "source": "P1_Permiso",
+        "target": "P1_Registrar",
+        "label": "Permitido",
+        "condition": "permiso_valido and datos_confirmados",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F18",
+        "source": "P1_Permiso",
+        "target": "P1_Humano",
+        "label": "Requiere revisión",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P1_F19",
+        "source": "P1_Humano",
+        "target": "P1_Autoriza",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F20",
+        "source": "P1_Autoriza",
+        "target": "P1_Resumen",
+        "label": "Sí; reconfirmar datos",
+        "condition": "autorizacion_valida and datos_completos",
+        "default": false,
+        "track": 1030
+      },
+      {
+        "id": "P1_F21",
+        "source": "P1_Autoriza",
+        "target": "P1_FinNo",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P1_F22",
+        "source": "P1_Registrar",
+        "target": "P1_Resultado",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F23",
+        "source": "P1_Resultado",
+        "target": "P1_Informar",
+        "label": "Registrado / existente",
+        "condition": "status in [registrado, ya_registrado]",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F24",
+        "source": "P1_Resultado",
+        "target": "P1_Pendiente",
+        "label": "Derivado / rechazado",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P1_F25",
+        "source": "P1_Error",
+        "target": "P1_Pendiente",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F26",
+        "source": "P1_Pendiente",
+        "target": "P1_Avisar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F27",
+        "source": "P1_Avisar",
+        "target": "P1_FinPend",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P1_F28",
+        "source": "P1_Informar",
+        "target": "P1_Fin",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      }
+    ]
+  },
+  {
+    "code": "P2",
+    "filename": "03-to-be-coordinacion-logistica.bpmn",
+    "process_id": "Process_P2",
+    "title": "P2 · Coordinar recojos, entregas y reprogramaciones",
+    "nodes": [
+      {
+        "id": "P2_S",
+        "short": "S",
+        "kind": "startEvent",
+        "label": "Pedido o evento de reprogramación",
+        "lane": 1,
+        "col": 0,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Contexto",
+        "short": "Contexto",
+        "kind": "serviceTask",
+        "label": "Consultar agenda, capacidad y restricciones",
+        "lane": 1,
+        "col": 1,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Analizar",
+        "short": "Analizar",
+        "kind": "serviceTask",
+        "label": "Interpretar urgencia y preferencias",
+        "lane": 0,
+        "col": 2,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Opciones",
+        "short": "Opciones",
+        "kind": "serviceTask",
+        "label": "Calcular opciones factibles con reglas",
+        "lane": 1,
+        "col": 3,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Viable",
+        "short": "Viable",
+        "kind": "exclusiveGateway",
+        "label": "¿Hay opciones factibles?",
+        "lane": 1,
+        "col": 4,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Proponer",
+        "short": "Proponer",
+        "kind": "sendTask",
+        "label": "Explicar alternativas y compromisos",
+        "lane": 0,
+        "col": 5,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Respuesta",
+        "short": "Respuesta",
+        "kind": "receiveTask",
+        "label": "Esperar elección o contrapropuesta",
+        "lane": 0,
+        "col": 6,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Timeout",
+        "short": "Timeout",
+        "kind": "boundaryEvent",
+        "label": "24 h sin elección",
+        "lane": 0,
+        "col": 6,
+        "row": 0,
+        "doc": "",
+        "attach": "Respuesta",
+        "event": "timer",
+        "duration": "PT24H"
+      },
+      {
+        "id": "P2_Eleccion",
+        "short": "Eleccion",
+        "kind": "exclusiveGateway",
+        "label": "¿Elección compatible?",
+        "lane": 0,
+        "col": 7,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Validar",
+        "short": "Validar",
+        "kind": "businessRuleTask",
+        "label": "Verificar permisos, SLA y versión de agenda",
+        "lane": 1,
+        "col": 8,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Revision",
+        "short": "Revision",
+        "kind": "exclusiveGateway",
+        "label": "¿Requiere aprobación?",
+        "lane": 1,
+        "col": 9,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Humano",
+        "short": "Humano",
+        "kind": "userTask",
+        "label": "Resolver conflicto de capacidad o plazo",
+        "lane": 2,
+        "col": 10,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Autoriza",
+        "short": "Autoriza",
+        "kind": "exclusiveGateway",
+        "label": "¿Autoriza un plan factible?",
+        "lane": 2,
+        "col": 11,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_FinNo",
+        "short": "FinNo",
+        "kind": "endEvent",
+        "label": "Caso pendiente con responsable",
+        "lane": 2,
+        "col": 12,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P2_Reservar",
+        "short": "Reservar",
+        "kind": "serviceTask",
+        "label": "Reservar / actualizar agenda de forma atómica",
+        "lane": 1,
+        "col": 12,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Error",
+        "short": "Error",
+        "kind": "boundaryEvent",
+        "label": "Conflicto o fallo de agenda",
+        "lane": 1,
+        "col": 12,
+        "row": 0,
+        "doc": "",
+        "attach": "Reservar",
+        "event": "error"
+      },
+      {
+        "id": "P2_Confirmar",
+        "short": "Confirmar",
+        "kind": "sendTask",
+        "label": "Confirmar horario realmente reservado",
+        "lane": 0,
+        "col": 13,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P2_Fin",
+        "short": "Fin",
+        "kind": "endEvent",
+        "label": "Agenda confirmada",
+        "lane": 0,
+        "col": 14,
+        "row": 0,
+        "doc": ""
+      }
+    ],
+    "flows": [
+      {
+        "id": "P2_F01",
+        "source": "P2_S",
+        "target": "P2_Contexto",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F02",
+        "source": "P2_Contexto",
+        "target": "P2_Analizar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F03",
+        "source": "P2_Analizar",
+        "target": "P2_Opciones",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F04",
+        "source": "P2_Opciones",
+        "target": "P2_Viable",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F05",
+        "source": "P2_Viable",
+        "target": "P2_Proponer",
+        "label": "Sí",
+        "condition": "opciones_factibles",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F06",
+        "source": "P2_Viable",
+        "target": "P2_Humano",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P2_F07",
+        "source": "P2_Proponer",
+        "target": "P2_Respuesta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F08",
+        "source": "P2_Respuesta",
+        "target": "P2_Eleccion",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F09",
+        "source": "P2_Timeout",
+        "target": "P2_Humano",
+        "label": "Sin respuesta",
+        "condition": null,
+        "default": false,
+        "track": 1060
+      },
+      {
+        "id": "P2_F10",
+        "source": "P2_Eleccion",
+        "target": "P2_Validar",
+        "label": "Seleccionada y factible",
+        "condition": "eleccion_factible",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F11",
+        "source": "P2_Eleccion",
+        "target": "P2_Analizar",
+        "label": "Contrapropuesta (hasta 2 rondas)",
+        "condition": "contrapropuesta and rondas < 2",
+        "default": false,
+        "track": 315
+      },
+      {
+        "id": "P2_F12",
+        "source": "P2_Eleccion",
+        "target": "P2_Humano",
+        "label": "Rechazo / límite",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P2_F13",
+        "source": "P2_Validar",
+        "target": "P2_Revision",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F14",
+        "source": "P2_Revision",
+        "target": "P2_Reservar",
+        "label": "Dentro de política",
+        "condition": "not requiere_aprobacion",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F15",
+        "source": "P2_Revision",
+        "target": "P2_Humano",
+        "label": "Sí",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P2_F16",
+        "source": "P2_Humano",
+        "target": "P2_Autoriza",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F17",
+        "source": "P2_Autoriza",
+        "target": "P2_Reservar",
+        "label": "Sí",
+        "condition": "autorizacion_valida and plan_factible",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F18",
+        "source": "P2_Autoriza",
+        "target": "P2_FinNo",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P2_F19",
+        "source": "P2_Reservar",
+        "target": "P2_Confirmar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P2_F20",
+        "source": "P2_Error",
+        "target": "P2_Humano",
+        "label": "No confirmar el horario",
+        "condition": null,
+        "default": false,
+        "track": 1030
+      },
+      {
+        "id": "P2_F21",
+        "source": "P2_Confirmar",
+        "target": "P2_Fin",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      }
+    ]
+  },
+  {
+    "code": "P3",
+    "filename": "04-to-be-calidad.bpmn",
+    "process_id": "Process_P3",
+    "title": "P3 · Analizar observaciones de calidad y recomendar tratamiento",
+    "nodes": [
+      {
+        "id": "P3_S",
+        "short": "S",
+        "kind": "startEvent",
+        "label": "Lote o prendas observadas",
+        "lane": 0,
+        "col": 0,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Inspeccion",
+        "short": "Inspeccion",
+        "kind": "manualTask",
+        "label": "Inspeccionar prendas y documentar hallazgos",
+        "lane": 0,
+        "col": 1,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Evidencia",
+        "short": "Evidencia",
+        "kind": "serviceTask",
+        "label": "Recuperar guía, historial y procedimientos vigentes",
+        "lane": 2,
+        "col": 2,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Analizar",
+        "short": "Analizar",
+        "kind": "serviceTask",
+        "label": "Contrastar hallazgos y proponer una disposición",
+        "lane": 1,
+        "col": 3,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Suficiente",
+        "short": "Suficiente",
+        "kind": "exclusiveGateway",
+        "label": "¿Hay evidencia suficiente?",
+        "lane": 1,
+        "col": 4,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Completar",
+        "short": "Completar",
+        "kind": "userTask",
+        "label": "Completar evidencia o descartar el análisis",
+        "lane": 0,
+        "col": 5,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P3_Nueva",
+        "short": "Nueva",
+        "kind": "exclusiveGateway",
+        "label": "¿Puede continuar?",
+        "lane": 0,
+        "col": 6,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P3_FinPend",
+        "short": "FinPend",
+        "kind": "endEvent",
+        "label": "Caso pendiente de evaluación técnica",
+        "lane": 0,
+        "col": 7,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P3_Validar",
+        "short": "Validar",
+        "kind": "businessRuleTask",
+        "label": "Comprobar restricciones y evidencia citada",
+        "lane": 2,
+        "col": 5,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Revisar",
+        "short": "Revisar",
+        "kind": "userTask",
+        "label": "Evaluar propuesta y autorizar disposición",
+        "lane": 0,
+        "col": 6,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Decision",
+        "short": "Decision",
+        "kind": "exclusiveGateway",
+        "label": "¿Disposición humana?",
+        "lane": 0,
+        "col": 7,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Reproceso",
+        "short": "Reproceso",
+        "kind": "manualTask",
+        "label": "Ejecutar reproceso autorizado según procedimiento",
+        "lane": 0,
+        "col": 8,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Verificar",
+        "short": "Verificar",
+        "kind": "manualTask",
+        "label": "Verificar resultado del reproceso (máx. 1 ciclo)",
+        "lane": 0,
+        "col": 9,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Conforme",
+        "short": "Conforme",
+        "kind": "exclusiveGateway",
+        "label": "¿Resultado conforme?",
+        "lane": 0,
+        "col": 10,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Registrar",
+        "short": "Registrar",
+        "kind": "serviceTask",
+        "label": "Registrar disposición conforme con evidencia",
+        "lane": 2,
+        "col": 11,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Fin",
+        "short": "Fin",
+        "kind": "endEvent",
+        "label": "Lote liberado por control de calidad",
+        "lane": 2,
+        "col": 12,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P3_Incidencia",
+        "short": "Incidencia",
+        "kind": "serviceTask",
+        "label": "Abrir expediente de incidencia para P4",
+        "lane": 2,
+        "col": 11,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P3_FinInc",
+        "short": "FinInc",
+        "kind": "endEvent",
+        "label": "Incidencia abierta; lote retenido",
+        "lane": 2,
+        "col": 12,
+        "row": 1,
+        "doc": ""
+      }
+    ],
+    "flows": [
+      {
+        "id": "P3_F01",
+        "source": "P3_S",
+        "target": "P3_Inspeccion",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F02",
+        "source": "P3_Inspeccion",
+        "target": "P3_Evidencia",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F03",
+        "source": "P3_Evidencia",
+        "target": "P3_Analizar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F04",
+        "source": "P3_Analizar",
+        "target": "P3_Suficiente",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F05",
+        "source": "P3_Suficiente",
+        "target": "P3_Validar",
+        "label": "Sí",
+        "condition": "evidencia_suficiente",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F06",
+        "source": "P3_Suficiente",
+        "target": "P3_Completar",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P3_F07",
+        "source": "P3_Completar",
+        "target": "P3_Nueva",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F08",
+        "source": "P3_Nueva",
+        "target": "P3_Evidencia",
+        "label": "Completa (1 solicitud)",
+        "condition": "evidencia_completada and solicitudes <= 1",
+        "default": false,
+        "track": 320
+      },
+      {
+        "id": "P3_F09",
+        "source": "P3_Nueva",
+        "target": "P3_FinPend",
+        "label": "No / límite",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P3_F10",
+        "source": "P3_Validar",
+        "target": "P3_Revisar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F11",
+        "source": "P3_Revisar",
+        "target": "P3_Decision",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F12",
+        "source": "P3_Decision",
+        "target": "P3_Registrar",
+        "label": "Liberar conforme",
+        "condition": "decision == liberar and verificacion_fisica_conforme",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F13",
+        "source": "P3_Decision",
+        "target": "P3_Reproceso",
+        "label": "Reprocesar",
+        "condition": "decision == reprocesar and reprocesos == 0",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F14",
+        "source": "P3_Decision",
+        "target": "P3_Incidencia",
+        "label": "Daño / pérdida / riesgo",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P3_F15",
+        "source": "P3_Reproceso",
+        "target": "P3_Verificar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F16",
+        "source": "P3_Verificar",
+        "target": "P3_Conforme",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F17",
+        "source": "P3_Conforme",
+        "target": "P3_Registrar",
+        "label": "Sí",
+        "condition": "verificacion_fisica_conforme",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F18",
+        "source": "P3_Conforme",
+        "target": "P3_Incidencia",
+        "label": "No (sin nuevo ciclo)",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P3_F19",
+        "source": "P3_Registrar",
+        "target": "P3_Fin",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P3_F20",
+        "source": "P3_Incidencia",
+        "target": "P3_FinInc",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      }
+    ]
+  },
+  {
+    "code": "P4",
+    "filename": "05-to-be-reclamos-incidencias.bpmn",
+    "process_id": "Process_P4",
+    "title": "P4 · Investigar y resolver reclamos e incidencias",
+    "nodes": [
+      {
+        "id": "P4_S",
+        "short": "S",
+        "kind": "startEvent",
+        "label": "Reclamo o incidencia registrado",
+        "lane": 1,
+        "col": 0,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Expediente",
+        "short": "Expediente",
+        "kind": "serviceTask",
+        "label": "Consolidar guía, mensajes e historial autorizado",
+        "lane": 1,
+        "col": 1,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Analizar",
+        "short": "Analizar",
+        "kind": "serviceTask",
+        "label": "Reconstruir hechos y proponer hipótesis",
+        "lane": 0,
+        "col": 2,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Suficiente",
+        "short": "Suficiente",
+        "kind": "exclusiveGateway",
+        "label": "¿Evidencia suficiente?",
+        "lane": 0,
+        "col": 3,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Solicitar",
+        "short": "Solicitar",
+        "kind": "sendTask",
+        "label": "Solicitar evidencia concreta faltante",
+        "lane": 0,
+        "col": 4,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P4_Respuesta",
+        "short": "Respuesta",
+        "kind": "receiveTask",
+        "label": "Esperar documentos o respuesta",
+        "lane": 0,
+        "col": 5,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P4_Timeout",
+        "short": "Timeout",
+        "kind": "boundaryEvent",
+        "label": "24 h sin evidencia",
+        "lane": 0,
+        "col": 5,
+        "row": 0,
+        "doc": "",
+        "attach": "Respuesta",
+        "event": "timer",
+        "duration": "PT24H"
+      },
+      {
+        "id": "P4_Alternativas",
+        "short": "Alternativas",
+        "kind": "serviceTask",
+        "label": "Proponer alternativas con sustento y límites",
+        "lane": 0,
+        "col": 4,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Politica",
+        "short": "Politica",
+        "kind": "businessRuleTask",
+        "label": "Validar evidencias, costos y competencias",
+        "lane": 1,
+        "col": 5,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Humano",
+        "short": "Humano",
+        "kind": "userTask",
+        "label": "Aprobar, corregir o rechazar la propuesta",
+        "lane": 2,
+        "col": 6,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Aprobada",
+        "short": "Aprobada",
+        "kind": "exclusiveGateway",
+        "label": "¿Existe propuesta autorizada?",
+        "lane": 2,
+        "col": 7,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Pendiente",
+        "short": "Pendiente",
+        "kind": "serviceTask",
+        "label": "Guardar pendiente y asignar responsable",
+        "lane": 1,
+        "col": 8,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P4_FinPend",
+        "short": "FinPend",
+        "kind": "endEvent",
+        "label": "Reclamo abierto con siguiente acción",
+        "lane": 1,
+        "col": 9,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "P4_Proponer",
+        "short": "Proponer",
+        "kind": "sendTask",
+        "label": "Comunicar solución autorizada al cliente",
+        "lane": 0,
+        "col": 8,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Elegir",
+        "short": "Elegir",
+        "kind": "receiveTask",
+        "label": "Esperar aceptación o contrapropuesta",
+        "lane": 0,
+        "col": 9,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Timeout2",
+        "short": "Timeout2",
+        "kind": "boundaryEvent",
+        "label": "24 h sin aceptación",
+        "lane": 0,
+        "col": 9,
+        "row": 0,
+        "doc": "",
+        "attach": "Elegir",
+        "event": "timer",
+        "duration": "PT24H"
+      },
+      {
+        "id": "P4_Acepta",
+        "short": "Acepta",
+        "kind": "exclusiveGateway",
+        "label": "¿Cliente acepta?",
+        "lane": 0,
+        "col": 10,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Ejecutar",
+        "short": "Ejecutar",
+        "kind": "serviceTask",
+        "label": "Ejecutar plan aprobado mediante servicios",
+        "lane": 1,
+        "col": 11,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Error",
+        "short": "Error",
+        "kind": "boundaryEvent",
+        "label": "Fallo de ejecución",
+        "lane": 1,
+        "col": 11,
+        "row": 0,
+        "doc": "",
+        "attach": "Ejecutar",
+        "event": "error"
+      },
+      {
+        "id": "P4_Cumplimiento",
+        "short": "Cumplimiento",
+        "kind": "userTask",
+        "label": "Verificar cumplimiento y documentar conformidad",
+        "lane": 2,
+        "col": 12,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Cumple",
+        "short": "Cumple",
+        "kind": "exclusiveGateway",
+        "label": "¿Cumplimiento acreditado?",
+        "lane": 2,
+        "col": 13,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Cerrar",
+        "short": "Cerrar",
+        "kind": "serviceTask",
+        "label": "Cerrar solo con evidencia del cumplimiento",
+        "lane": 1,
+        "col": 14,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "P4_Fin",
+        "short": "Fin",
+        "kind": "endEvent",
+        "label": "Reclamo resuelto y trazable",
+        "lane": 1,
+        "col": 15,
+        "row": 0,
+        "doc": ""
+      }
+    ],
+    "flows": [
+      {
+        "id": "P4_F01",
+        "source": "P4_S",
+        "target": "P4_Expediente",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F02",
+        "source": "P4_Expediente",
+        "target": "P4_Analizar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F03",
+        "source": "P4_Analizar",
+        "target": "P4_Suficiente",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F04",
+        "source": "P4_Suficiente",
+        "target": "P4_Alternativas",
+        "label": "Sí",
+        "condition": "evidencia_suficiente",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F05",
+        "source": "P4_Suficiente",
+        "target": "P4_Solicitar",
+        "label": "Aclarable (1 ronda)",
+        "condition": "faltantes_identificados and solicitudes < 1",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F06",
+        "source": "P4_Suficiente",
+        "target": "P4_Pendiente",
+        "label": "Sin sustento / límite",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P4_F07",
+        "source": "P4_Solicitar",
+        "target": "P4_Respuesta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F08",
+        "source": "P4_Respuesta",
+        "target": "P4_Expediente",
+        "label": "Evidencia recibida",
+        "condition": null,
+        "default": false,
+        "track": 315
+      },
+      {
+        "id": "P4_F09",
+        "source": "P4_Timeout",
+        "target": "P4_Pendiente",
+        "label": "Sin respuesta",
+        "condition": null,
+        "default": false,
+        "track": 690
+      },
+      {
+        "id": "P4_F10",
+        "source": "P4_Alternativas",
+        "target": "P4_Politica",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F11",
+        "source": "P4_Politica",
+        "target": "P4_Humano",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F12",
+        "source": "P4_Humano",
+        "target": "P4_Aprobada",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F13",
+        "source": "P4_Aprobada",
+        "target": "P4_Proponer",
+        "label": "Sí",
+        "condition": "propuesta_autorizada",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F14",
+        "source": "P4_Aprobada",
+        "target": "P4_Pendiente",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P4_F15",
+        "source": "P4_Proponer",
+        "target": "P4_Elegir",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F16",
+        "source": "P4_Elegir",
+        "target": "P4_Acepta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F17",
+        "source": "P4_Timeout2",
+        "target": "P4_Pendiente",
+        "label": "Sin respuesta",
+        "condition": null,
+        "default": false,
+        "track": 705
+      },
+      {
+        "id": "P4_F18",
+        "source": "P4_Acepta",
+        "target": "P4_Ejecutar",
+        "label": "Sí",
+        "condition": "aceptacion_cliente",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F19",
+        "source": "P4_Acepta",
+        "target": "P4_Alternativas",
+        "label": "Contrapropuesta (1 ronda)",
+        "condition": "contrapropuesta and negociaciones < 1",
+        "default": false,
+        "track": 340
+      },
+      {
+        "id": "P4_F20",
+        "source": "P4_Acepta",
+        "target": "P4_Pendiente",
+        "label": "No / límite",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "P4_F21",
+        "source": "P4_Ejecutar",
+        "target": "P4_Cumplimiento",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F22",
+        "source": "P4_Error",
+        "target": "P4_Pendiente",
+        "label": "No cerrar",
+        "condition": null,
+        "default": false,
+        "track": 720
+      },
+      {
+        "id": "P4_F23",
+        "source": "P4_Cumplimiento",
+        "target": "P4_Cumple",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F24",
+        "source": "P4_Cumple",
+        "target": "P4_Cerrar",
+        "label": "Sí",
+        "condition": "cumplimiento_acreditado",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F25",
+        "source": "P4_Cumple",
+        "target": "P4_Pendiente",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": 1030
+      },
+      {
+        "id": "P4_F26",
+        "source": "P4_Pendiente",
+        "target": "P4_FinPend",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "P4_F27",
+        "source": "P4_Cerrar",
+        "target": "P4_Fin",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      }
+    ]
+  },
+  {
+    "code": "Integral",
+    "filename": "01-to-be-integral.bpmn",
+    "process_id": "Process_Integral",
+    "title": "TO BE integral · Atender el pedido corporativo",
+    "nodes": [
+      {
+        "id": "Integral_S",
+        "short": "S",
+        "kind": "startEvent",
+        "label": "Solicitud recibida",
+        "lane": 0,
+        "col": 0,
+        "row": 0,
+        "doc": "",
+        "event": "message"
+      },
+      {
+        "id": "Integral_P1",
+        "short": "P1",
+        "kind": "callActivity",
+        "label": "P1 · Interpretar y registrar solicitud",
+        "lane": 0,
+        "col": 1,
+        "row": 0,
+        "doc": "",
+        "call": "P1"
+      },
+      {
+        "id": "Integral_Registrado",
+        "short": "Registrado",
+        "kind": "exclusiveGateway",
+        "label": "¿Pedido registrado?",
+        "lane": 0,
+        "col": 2,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Pendiente",
+        "short": "Pendiente",
+        "kind": "endEvent",
+        "label": "Solicitud pendiente o no autorizada",
+        "lane": 0,
+        "col": 3,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Integral_P2R",
+        "short": "P2R",
+        "kind": "callActivity",
+        "label": "P2 · Coordinar recojo",
+        "lane": 0,
+        "col": 3,
+        "row": 0,
+        "doc": "",
+        "call": "P2"
+      },
+      {
+        "id": "Integral_Agendado",
+        "short": "Agendado",
+        "kind": "exclusiveGateway",
+        "label": "¿Recojo confirmado?",
+        "lane": 0,
+        "col": 4,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Recoger",
+        "short": "Recoger",
+        "kind": "manualTask",
+        "label": "Recoger y recibir prendas en planta",
+        "lane": 1,
+        "col": 5,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Procesar",
+        "short": "Procesar",
+        "kind": "manualTask",
+        "label": "Lavar, secar y planchar según procedimiento",
+        "lane": 1,
+        "col": 6.4,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_P3",
+        "short": "P3",
+        "kind": "callActivity",
+        "label": "P3 · Analizar y verificar calidad",
+        "lane": 2,
+        "col": 7,
+        "row": 0,
+        "doc": "",
+        "call": "P3"
+      },
+      {
+        "id": "Integral_Calidad",
+        "short": "Calidad",
+        "kind": "exclusiveGateway",
+        "label": "¿Disposición del lote?",
+        "lane": 2,
+        "col": 8,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_P4",
+        "short": "P4",
+        "kind": "callActivity",
+        "label": "P4 · Resolver incidencia del lote",
+        "lane": 0,
+        "col": 9,
+        "row": 1,
+        "doc": "",
+        "call": "P4"
+      },
+      {
+        "id": "Integral_Solucion",
+        "short": "Solucion",
+        "kind": "exclusiveGateway",
+        "label": "¿Solución cumplida?",
+        "lane": 0,
+        "col": 10,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Integral_FinInc",
+        "short": "FinInc",
+        "kind": "endEvent",
+        "label": "Incidencia abierta o cierre sin entrega",
+        "lane": 0,
+        "col": 11.65,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Empacar",
+        "short": "Empacar",
+        "kind": "manualTask",
+        "label": "Empacar y etiquetar prendas liberadas",
+        "lane": 1,
+        "col": 11,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Cargo",
+        "short": "Cargo",
+        "kind": "userTask",
+        "label": "Registrar cargo y documentación comercial",
+        "lane": 2,
+        "col": 12,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_P2E",
+        "short": "P2E",
+        "kind": "callActivity",
+        "label": "P2 · Coordinar entrega",
+        "lane": 0,
+        "col": 13,
+        "row": 0,
+        "doc": "",
+        "call": "P2"
+      },
+      {
+        "id": "Integral_EntregaAgenda",
+        "short": "EntregaAgenda",
+        "kind": "exclusiveGateway",
+        "label": "¿Entrega confirmada?",
+        "lane": 0,
+        "col": 14,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Entregar",
+        "short": "Entregar",
+        "kind": "manualTask",
+        "label": "Entregar y obtener firma de recepción",
+        "lane": 1,
+        "col": 15,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Reclamo",
+        "short": "Reclamo",
+        "kind": "eventBasedGateway",
+        "label": "Esperar observación o fin de ventana",
+        "lane": 0,
+        "col": 16,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Obs",
+        "short": "Obs",
+        "kind": "intermediateCatchEvent",
+        "label": "Observación recibida",
+        "lane": 0,
+        "col": 17,
+        "row": 1,
+        "doc": "",
+        "event": "message"
+      },
+      {
+        "id": "Integral_Ventana",
+        "short": "Ventana",
+        "kind": "intermediateCatchEvent",
+        "label": "48 h sin observación",
+        "lane": 0,
+        "col": 17,
+        "row": 0,
+        "doc": "",
+        "event": "timer",
+        "duration": "PT48H"
+      },
+      {
+        "id": "Integral_P4C",
+        "short": "P4C",
+        "kind": "callActivity",
+        "label": "P4 · Gestionar reclamo posterior",
+        "lane": 0,
+        "col": 18,
+        "row": 1,
+        "doc": "",
+        "call": "P4"
+      },
+      {
+        "id": "Integral_Resuelto",
+        "short": "Resuelto",
+        "kind": "exclusiveGateway",
+        "label": "¿Reclamo resuelto?",
+        "lane": 0,
+        "col": 19,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Integral_FinRecl",
+        "short": "FinRecl",
+        "kind": "endEvent",
+        "label": "Pedido entregado con reclamo abierto",
+        "lane": 0,
+        "col": 20,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Cerrar",
+        "short": "Cerrar",
+        "kind": "userTask",
+        "label": "Verificar guía y cerrar registro del pedido",
+        "lane": 2,
+        "col": 20,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_Fin",
+        "short": "Fin",
+        "kind": "endEvent",
+        "label": "Pedido entregado y documentado",
+        "lane": 2,
+        "col": 21,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_RecojoOK",
+        "short": "RecojoOK",
+        "kind": "exclusiveGateway",
+        "label": "¿Recojo realizado?",
+        "lane": 1,
+        "col": 5.65,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_EntregaOK",
+        "short": "EntregaOK",
+        "kind": "exclusiveGateway",
+        "label": "¿Entrega realizada?",
+        "lane": 1,
+        "col": 15.65,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Integral_EsperaRecojo",
+        "short": "EsperaRecojo",
+        "kind": "intermediateCatchEvent",
+        "label": "Esperar el horario confirmado de recojo",
+        "lane": 1,
+        "col": 4.5,
+        "row": 0,
+        "doc": "",
+        "event": "timerDate",
+        "date_expression": "fecha_hora_recojo_confirmada"
+      },
+      {
+        "id": "Integral_EsperaEntrega",
+        "short": "EsperaEntrega",
+        "kind": "intermediateCatchEvent",
+        "label": "Esperar el horario confirmado de entrega",
+        "lane": 1,
+        "col": 14.5,
+        "row": 0,
+        "doc": "",
+        "event": "timerDate",
+        "date_expression": "fecha_hora_entrega_confirmada"
+      },
+      {
+        "id": "Integral_Retraso",
+        "short": "Retraso",
+        "kind": "boundaryEvent",
+        "label": "24 h sin completar planta",
+        "lane": 1,
+        "col": 6.4,
+        "row": 0,
+        "doc": "",
+        "attach": "Procesar",
+        "event": "timer",
+        "duration": "PT24H",
+        "cancel": false
+      },
+      {
+        "id": "Integral_Alerta",
+        "short": "Alerta",
+        "kind": "sendTask",
+        "label": "Comunicar retraso y revisar compromiso",
+        "lane": 0,
+        "col": 7.4,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Integral_FinAlerta",
+        "short": "FinAlerta",
+        "kind": "endEvent",
+        "label": "Aviso registrado; planta continúa",
+        "lane": 0,
+        "col": 8.4,
+        "row": 1,
+        "doc": ""
+      }
+    ],
+    "flows": [
+      {
+        "id": "Integral_F01",
+        "source": "Integral_S",
+        "target": "Integral_P1",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F02",
+        "source": "Integral_P1",
+        "target": "Integral_Registrado",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F03",
+        "source": "Integral_Registrado",
+        "target": "Integral_P2R",
+        "label": "Registrado / existente",
+        "condition": "pedido_registrado",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F04",
+        "source": "Integral_Registrado",
+        "target": "Integral_Pendiente",
+        "label": "Otro resultado",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "Integral_F05",
+        "source": "Integral_P2R",
+        "target": "Integral_Agendado",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F06",
+        "source": "Integral_Agendado",
+        "target": "Integral_EsperaRecojo",
+        "label": "Sí",
+        "condition": "recojo_confirmado",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F07",
+        "source": "Integral_EsperaRecojo",
+        "target": "Integral_Recoger",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F08",
+        "source": "Integral_Agendado",
+        "target": "Integral_Pendiente",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": 330
+      },
+      {
+        "id": "Integral_F09",
+        "source": "Integral_Recoger",
+        "target": "Integral_RecojoOK",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F10",
+        "source": "Integral_RecojoOK",
+        "target": "Integral_Procesar",
+        "label": "Sí",
+        "condition": "recojo_realizado",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F11",
+        "source": "Integral_RecojoOK",
+        "target": "Integral_P2R",
+        "label": "Fallo: 1 reprogramación",
+        "condition": "not recojo_realizado and reprogramaciones_recojo < 1",
+        "default": false,
+        "track": 680
+      },
+      {
+        "id": "Integral_F12",
+        "source": "Integral_RecojoOK",
+        "target": "Integral_Pendiente",
+        "label": "Límite",
+        "condition": null,
+        "default": true,
+        "track": 700
+      },
+      {
+        "id": "Integral_F13",
+        "source": "Integral_Procesar",
+        "target": "Integral_P3",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F14",
+        "source": "Integral_P3",
+        "target": "Integral_Calidad",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F15",
+        "source": "Integral_Retraso",
+        "target": "Integral_Alerta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F16",
+        "source": "Integral_Alerta",
+        "target": "Integral_FinAlerta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F17",
+        "source": "Integral_Calidad",
+        "target": "Integral_Empacar",
+        "label": "Liberado",
+        "condition": "lote_liberado",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F18",
+        "source": "Integral_Calidad",
+        "target": "Integral_P4",
+        "label": "Incidencia",
+        "condition": "incidencia_abierta",
+        "default": false,
+        "track": 305
+      },
+      {
+        "id": "Integral_F19",
+        "source": "Integral_Calidad",
+        "target": "Integral_FinInc",
+        "label": "Pendiente técnico",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "Integral_F20",
+        "source": "Integral_P4",
+        "target": "Integral_Solucion",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F21",
+        "source": "Integral_Solucion",
+        "target": "Integral_Empacar",
+        "label": "Lote liberado",
+        "condition": "solucion_cumplida and lote_liberado",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F22",
+        "source": "Integral_Solucion",
+        "target": "Integral_FinInc",
+        "label": "No / sin entrega",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "Integral_F23",
+        "source": "Integral_Empacar",
+        "target": "Integral_Cargo",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F24",
+        "source": "Integral_Cargo",
+        "target": "Integral_P2E",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F25",
+        "source": "Integral_P2E",
+        "target": "Integral_EntregaAgenda",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F26",
+        "source": "Integral_EntregaAgenda",
+        "target": "Integral_EsperaEntrega",
+        "label": "Sí",
+        "condition": "entrega_confirmada",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F27",
+        "source": "Integral_EsperaEntrega",
+        "target": "Integral_Entregar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F28",
+        "source": "Integral_EntregaAgenda",
+        "target": "Integral_FinInc",
+        "label": "No; agenda pendiente",
+        "condition": null,
+        "default": true,
+        "track": 350
+      },
+      {
+        "id": "Integral_F29",
+        "source": "Integral_Entregar",
+        "target": "Integral_EntregaOK",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F30",
+        "source": "Integral_EntregaOK",
+        "target": "Integral_Reclamo",
+        "label": "Sí",
+        "condition": "entrega_realizada",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F31",
+        "source": "Integral_EntregaOK",
+        "target": "Integral_P2E",
+        "label": "Fallo: 1 reprogramación",
+        "condition": "not entrega_realizada and reprogramaciones_entrega < 1",
+        "default": false,
+        "track": 680
+      },
+      {
+        "id": "Integral_F32",
+        "source": "Integral_EntregaOK",
+        "target": "Integral_FinInc",
+        "label": "Límite",
+        "condition": null,
+        "default": true,
+        "track": 705
+      },
+      {
+        "id": "Integral_F33",
+        "source": "Integral_Reclamo",
+        "target": "Integral_Obs",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F34",
+        "source": "Integral_Reclamo",
+        "target": "Integral_Ventana",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F35",
+        "source": "Integral_Obs",
+        "target": "Integral_P4C",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F36",
+        "source": "Integral_Ventana",
+        "target": "Integral_Cerrar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F37",
+        "source": "Integral_P4C",
+        "target": "Integral_Resuelto",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F38",
+        "source": "Integral_Resuelto",
+        "target": "Integral_Cerrar",
+        "label": "Sí",
+        "condition": "reclamo_resuelto",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Integral_F39",
+        "source": "Integral_Resuelto",
+        "target": "Integral_FinRecl",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "Integral_F40",
+        "source": "Integral_Cerrar",
+        "target": "Integral_Fin",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      }
+    ]
+  },
+  {
+    "code": "Orquestacion",
+    "filename": "06-orquestacion-multiagente.bpmn",
+    "process_id": "Process_Orquestacion",
+    "title": "Orquestación técnica · Resolver un caso con especialistas",
+    "nodes": [
+      {
+        "id": "Orquestacion_S",
+        "short": "S",
+        "kind": "startEvent",
+        "label": "Evento de negocio autenticado",
+        "lane": 1,
+        "col": 0,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Cargar",
+        "short": "Cargar",
+        "kind": "serviceTask",
+        "label": "Validar evento y cargar estado del caso",
+        "lane": 1,
+        "col": 1,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Ruta",
+        "short": "Ruta",
+        "kind": "serviceTask",
+        "label": "Proponer intención y especialista con evidencia",
+        "lane": 0,
+        "col": 2,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_ValidarRuta",
+        "short": "ValidarRuta",
+        "kind": "businessRuleTask",
+        "label": "Validar ruta, acceso y presupuesto",
+        "lane": 1,
+        "col": 3,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Elegir",
+        "short": "Elegir",
+        "kind": "exclusiveGateway",
+        "label": "¿Dominio autorizado?",
+        "lane": 1,
+        "col": 4,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Atencion",
+        "short": "Atencion",
+        "kind": "serviceTask",
+        "label": "Agente de atención · P1",
+        "lane": 0,
+        "col": 5,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Logistica",
+        "short": "Logistica",
+        "kind": "serviceTask",
+        "label": "Agente de logística · P2",
+        "lane": 0,
+        "col": 5,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Calidad",
+        "short": "Calidad",
+        "kind": "serviceTask",
+        "label": "Agente de calidad · P3",
+        "lane": 0,
+        "col": 6,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Incidencias",
+        "short": "Incidencias",
+        "kind": "serviceTask",
+        "label": "Agente de incidencias · P4",
+        "lane": 0,
+        "col": 6,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Merge",
+        "short": "Merge",
+        "kind": "exclusiveGateway",
+        "label": "Consolidar una propuesta",
+        "lane": 0,
+        "col": 7,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Policy",
+        "short": "Policy",
+        "kind": "businessRuleTask",
+        "label": "Validar esquema, evidencia, versión y permisos",
+        "lane": 1,
+        "col": 8,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_HITL",
+        "short": "HITL",
+        "kind": "exclusiveGateway",
+        "label": "¿Requiere revisión humana?",
+        "lane": 1,
+        "col": 9,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Revisar",
+        "short": "Revisar",
+        "kind": "userTask",
+        "label": "Revisar la propuesta vinculada a su versión",
+        "lane": 2,
+        "col": 10,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Autorizada",
+        "short": "Autorizada",
+        "kind": "exclusiveGateway",
+        "label": "¿Propuesta autorizada y vigente?",
+        "lane": 2,
+        "col": 11,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Ejecutar",
+        "short": "Ejecutar",
+        "kind": "serviceTask",
+        "label": "Ejecutar comando idempotente autorizado",
+        "lane": 1,
+        "col": 12,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Error",
+        "short": "Error",
+        "kind": "boundaryEvent",
+        "label": "Fallo técnico / conflicto",
+        "lane": 1,
+        "col": 12,
+        "row": 0,
+        "doc": "",
+        "attach": "Ejecutar",
+        "event": "error"
+      },
+      {
+        "id": "Orquestacion_Resultado",
+        "short": "Resultado",
+        "kind": "serviceTask",
+        "label": "Persistir resultado y emitir notificación por outbox",
+        "lane": 1,
+        "col": 13,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Fin",
+        "short": "Fin",
+        "kind": "endEvent",
+        "label": "Caso actualizado con trazas",
+        "lane": 1,
+        "col": 14,
+        "row": 0,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_Cola",
+        "short": "Cola",
+        "kind": "serviceTask",
+        "label": "Guardar pendiente y asignar responsable",
+        "lane": 2,
+        "col": 12,
+        "row": 1,
+        "doc": ""
+      },
+      {
+        "id": "Orquestacion_FinPend",
+        "short": "FinPend",
+        "kind": "endEvent",
+        "label": "Caso pendiente de atención",
+        "lane": 2,
+        "col": 13,
+        "row": 1,
+        "doc": ""
+      }
+    ],
+    "flows": [
+      {
+        "id": "Orquestacion_F01",
+        "source": "Orquestacion_S",
+        "target": "Orquestacion_Cargar",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F02",
+        "source": "Orquestacion_Cargar",
+        "target": "Orquestacion_Ruta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F03",
+        "source": "Orquestacion_Ruta",
+        "target": "Orquestacion_ValidarRuta",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F04",
+        "source": "Orquestacion_ValidarRuta",
+        "target": "Orquestacion_Elegir",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F05",
+        "source": "Orquestacion_Elegir",
+        "target": "Orquestacion_Atencion",
+        "label": "Atención",
+        "condition": "dominio == atencion",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F06",
+        "source": "Orquestacion_Elegir",
+        "target": "Orquestacion_Logistica",
+        "label": "Logística",
+        "condition": "dominio == logistica",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F07",
+        "source": "Orquestacion_Elegir",
+        "target": "Orquestacion_Calidad",
+        "label": "Calidad",
+        "condition": "dominio == calidad",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F08",
+        "source": "Orquestacion_Elegir",
+        "target": "Orquestacion_Incidencias",
+        "label": "Incidencias",
+        "condition": "dominio == incidencias",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F09",
+        "source": "Orquestacion_Elegir",
+        "target": "Orquestacion_Cola",
+        "label": "Ambiguo / no autorizado",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F10",
+        "source": "Orquestacion_Atencion",
+        "target": "Orquestacion_Merge",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F11",
+        "source": "Orquestacion_Logistica",
+        "target": "Orquestacion_Merge",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F12",
+        "source": "Orquestacion_Calidad",
+        "target": "Orquestacion_Merge",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F13",
+        "source": "Orquestacion_Incidencias",
+        "target": "Orquestacion_Merge",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F14",
+        "source": "Orquestacion_Merge",
+        "target": "Orquestacion_Policy",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F15",
+        "source": "Orquestacion_Policy",
+        "target": "Orquestacion_HITL",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F16",
+        "source": "Orquestacion_HITL",
+        "target": "Orquestacion_Ejecutar",
+        "label": "Permitido automáticamente",
+        "condition": "politica_auto_permitida",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F17",
+        "source": "Orquestacion_HITL",
+        "target": "Orquestacion_Revisar",
+        "label": "Revisión / evidencia insuficiente",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F18",
+        "source": "Orquestacion_Revisar",
+        "target": "Orquestacion_Autorizada",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F19",
+        "source": "Orquestacion_Autorizada",
+        "target": "Orquestacion_Ejecutar",
+        "label": "Sí",
+        "condition": "autorizacion_valida and version_vigente",
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F20",
+        "source": "Orquestacion_Autorizada",
+        "target": "Orquestacion_Cola",
+        "label": "No",
+        "condition": null,
+        "default": true,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F21",
+        "source": "Orquestacion_Ejecutar",
+        "target": "Orquestacion_Resultado",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F22",
+        "source": "Orquestacion_Error",
+        "target": "Orquestacion_Cola",
+        "label": "Sin confirmar efectos",
+        "condition": null,
+        "default": false,
+        "track": 1050
+      },
+      {
+        "id": "Orquestacion_F23",
+        "source": "Orquestacion_Resultado",
+        "target": "Orquestacion_Fin",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      },
+      {
+        "id": "Orquestacion_F24",
+        "source": "Orquestacion_Cola",
+        "target": "Orquestacion_FinPend",
+        "label": "",
+        "condition": null,
+        "default": false,
+        "track": null
+      }
+    ]
+  }
+]

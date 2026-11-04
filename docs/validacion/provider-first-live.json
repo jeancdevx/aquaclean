@@ -1,0 +1,12 @@
+{
+  "status": "verified",
+  "chat_model": "gemini-3.8-flash",
+  "embedding_model": "gemini-embedding-001",
+  "dimension": 768,
+  "routing": {
+    "process": "P1",
+    "needs_clarification": false,
+    "rationale_summary": "El usuario solicita un pedido de servicio para la recogida de toallas programada para el día siguiente."
+  },
+  "duration_seconds": 16.4
+}

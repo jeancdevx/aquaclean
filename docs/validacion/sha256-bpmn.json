@@ -1,0 +1,10 @@
+{
+  "bpmn/00-as-is-revisado.bpmn": "3da604966f841eda5e579bc86cfee2010ddc1e44e5d67555df387d042b816eda",
+  "bpmn/01-to-be-integral.bpmn": "c9677e63137ef68ba564de4114021d7595c02daa968109d16416b3f74a020b67",
+  "bpmn/02-to-be-solicitudes.bpmn": "b75bb3a24e202eacf151db23f981fb6b88aa01c4984ad33d3c6f4e9e0a1953d3",
+  "bpmn/03-to-be-coordinacion-logistica.bpmn": "edcf0c1b8111ba536df496ed61a1f6371cf77295d1b7ee8a070745435f39cb0d",
+  "bpmn/04-to-be-calidad.bpmn": "9d0670e52c8d15c984e0877c3b7e40183f7878a69b1f01296f45bdbb866d7152",
+  "bpmn/05-to-be-reclamos-incidencias.bpmn": "c809016200b35a5f2061b3fde641b69f56a10de6eb6a469f1fb8aa2889f5f2d3",
+  "bpmn/06-orquestacion-multiagente.bpmn": "8ffd1095e9b969c6ad8fc89a196ee0bba5941b8dc16a25e8560b6a04fd20ac5c",
+  "bpmn/07-rpa-determinista-referencia.bpmn": "216ea0db8f24d4a01423169119feebe3349ee62bc2db2914698878ab1e55a92f"
+}

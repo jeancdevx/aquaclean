@@ -1,0 +1,55 @@
+{
+  "note": "Comprobaci\u00f3n de pares de color del dise\u00f1o, no prueba de UI implementada",
+  "pairs": [
+    {
+      "foreground": "#0F172A",
+      "background": "#FFFFFF",
+      "ratio": 17.85
+    },
+    {
+      "foreground": "#475569",
+      "background": "#F1F5F9",
+      "ratio": 6.92
+    },
+    {
+      "foreground": "#FFFFFF",
+      "background": "#0F766E",
+      "ratio": 5.47
+    },
+    {
+      "foreground": "#E2E8F0",
+      "background": "#111827",
+      "ratio": 14.39
+    },
+    {
+      "foreground": "#94A3B8",
+      "background": "#0B1220",
+      "ratio": 7.3
+    },
+    {
+      "foreground": "#042F2E",
+      "background": "#2DD4BF",
+      "ratio": 7.77
+    },
+    {
+      "foreground": "#E2E8F0",
+      "background": "#134E4A",
+      "ratio": 7.69
+    },
+    {
+      "foreground": "#047857",
+      "background": "#ECFDF5",
+      "ratio": 5.21
+    },
+    {
+      "foreground": "#92400E",
+      "background": "#FFFBEB",
+      "ratio": 6.84
+    },
+    {
+      "foreground": "#B91C1C",
+      "background": "#FEF2F2",
+      "ratio": 5.91
+    }
+  ]
+}

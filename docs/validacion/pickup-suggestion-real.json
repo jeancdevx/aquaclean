@@ -1,0 +1,22 @@
+{
+  "synthetic": true,
+  "provider": "Gemini real",
+  "case_id": "8227314c-cef0-41fd-bb10-7a7ec05ef045",
+  "run_id": "b63552ff-a55f-438f-ba9f-b423c7e3ef94",
+  "status": "awaiting_information",
+  "process": "P1",
+  "fields": {
+    "cliente_id": "CLI-0001",
+    "direccion_recojo": "Av. Demostración 123, Lima (dirección sintética)"
+  },
+  "missing_fields": [
+    "solicitante",
+    "correo",
+    "fecha_recojo",
+    "turno",
+    "tipo_ropa",
+    "bolsas"
+  ],
+  "response": "Para programar el recojo, necesitamos recopilar y revisar los siguientes datos obligatorios: solicitante, correo de contacto, fecha exacta de recojo, turno (mañana o tarde), tipo de ropa y cantidad de bolsas. Con gusto te ayudaré a completar este registro paso a paso.",
+  "orders_before_confirmation": 0
+}

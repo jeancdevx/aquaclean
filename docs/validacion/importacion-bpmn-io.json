@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-14",
+  "bpmn_moddle": "10.3.1",
+  "bpmn_js": "18.31.0",
+  "results": [
+    {
+      "file": "00-as-is-revisado.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 340,
+      "render": {
+        "width": 3980,
+        "height": 1476
+      }
+    },
+    {
+      "file": "01-to-be-integral.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 176,
+      "render": {
+        "width": 5355,
+        "height": 1340
+      }
+    },
+    {
+      "file": "02-to-be-solicitudes.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 137,
+      "render": {
+        "width": 3710,
+        "height": 1340
+      }
+    },
+    {
+      "file": "03-to-be-coordinacion-logistica.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 103,
+      "render": {
+        "width": 3710,
+        "height": 1340
+      }
+    },
+    {
+      "file": "04-to-be-calidad.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 90,
+      "render": {
+        "width": 3240,
+        "height": 1220
+      }
+    },
+    {
+      "file": "05-to-be-reclamos-incidencias.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 128,
+      "render": {
+        "width": 3945,
+        "height": 1340
+      }
+    },
+    {
+      "file": "06-orquestacion-multiagente.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 104,
+      "render": {
+        "width": 3710,
+        "height": 1220
+      }
+    },
+    {
+      "file": "07-rpa-determinista-referencia.bpmn",
+      "bpmn_moddle_warnings": [],
+      "bpmn_js_import_warnings": [],
+      "elements": 150,
+      "render": {
+        "width": 3400,
+        "height": 1010
+      }
+    }
+  ]
+}

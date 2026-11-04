@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-14",
+  "scope": "XML, referencias, ámbitos, carriles, DI, condiciones, rutas y geometría de conectores nuevos",
+  "files": [
+    {
+      "file": "00-as-is-revisado.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [
+        "Condición solo etiquetada en referencia previa: F03",
+        "Condición solo etiquetada en referencia previa: F05",
+        "Condición solo etiquetada en referencia previa: F06",
+        "Condición solo etiquetada en referencia previa: F07",
+        "Condición solo etiquetada en referencia previa: F13",
+        "Condición solo etiquetada en referencia previa: F16",
+        "Condición solo etiquetada en referencia previa: F22",
+        "Condición solo etiquetada en referencia previa: F26",
+        "Condición solo etiquetada en referencia previa: F35",
+        "Condición solo etiquetada en referencia previa: F38",
+        "Condición solo etiquetada en referencia previa: SP2_F4",
+        "Condición solo etiquetada en referencia previa: SP2_F5",
+        "Condición solo etiquetada en referencia previa: SP4_F4",
+        "Condición solo etiquetada en referencia previa: SP4_F5"
+      ],
+      "sequence_shape_crossings": [],
+      "passed": true
+    },
+    {
+      "file": "01-to-be-integral.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [],
+      "sequence_shape_crossings": [],
+      "passed": true
+    },
+    {
+      "file": "02-to-be-solicitudes.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [],
+      "sequence_shape_crossings": [],
+      "passed": true
+    },
+    {
+      "file": "03-to-be-coordinacion-logistica.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [],
+      "sequence_shape_crossings": [],
+      "passed": true
+    },
+    {
+      "file": "04-to-be-calidad.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [],
+      "sequence_shape_crossings": [],
+      "passed": true
+    },
+    {
+      "file": "05-to-be-reclamos-incidencias.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [],
+      "sequence_shape_crossings": [],
+      "passed": true
+    },
+    {
+      "file": "06-orquestacion-multiagente.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [],
+      "sequence_shape_crossings": [],
+      "passed": true
+    },
+    {
+      "file": "07-rpa-determinista-referencia.bpmn",
+      "xsd_valid": true,
+      "structural_errors": [],
+      "legacy_notes": [
+        "Condición solo etiquetada en referencia previa: F03",
+        "Condición solo etiquetada en referencia previa: F07",
+        "Condición solo etiquetada en referencia previa: F10",
+        "Condición solo etiquetada en referencia previa: F12",
+        "Condición solo etiquetada en referencia previa: F14",
+        "Condición solo etiquetada en referencia previa: F15",
+        "Condición solo etiquetada en referencia previa: F19"
+      ],
+      "sequence_shape_crossings": [],
+      "passed": true
+    }
+  ],
+  "passed": true
+}

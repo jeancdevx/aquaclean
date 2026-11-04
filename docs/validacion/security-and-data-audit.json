@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-10-16T23:35:50.565732-05:00",
+  "secret_scan": {
+    "files_checked": 210,
+    "matching_files": [],
+    "database_rows_checked": 5102,
+    "database_matches": 0
+  },
+  "runtime_role": {
+    "rolname": "aquaclean_runtime",
+    "rolsuper": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false
+  },
+  "schema": {
+    "version": 4
+  },
+  "synthetic_history": {
+    "cases": 3000,
+    "first_created": "2024-10-16 14:15:00+00:00",
+    "last_updated": "2026-10-09 02:00:00+00:00"
+  },
+  "public_history": {
+    "records": 151,
+    "first_date": "1974-02-15",
+    "last_date": "2026-09-17"
+  },
+  "vector_store": [
+    {
+      "model": "gemini-embedding-001",
+      "dimension": 768,
+      "chunks": 14,
+      "min_dim": 768,
+      "max_dim": 768
+    }
+  ],
+  "capacity_violations": {
+    "n": 0
+  },
+  "chronology_violations": {
+    "n": 0
+  }
+}
