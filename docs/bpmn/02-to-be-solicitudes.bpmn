@@ -1,0 +1,582 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ac="https://aquaclean.example/bpmn" id="Definitions_P1" targetNamespace="https://aquaclean.example/bpmn" exporter="Aqua Clean - diseño académico BPMN 2.0" exporterVersion="1.0">
+  <bpmn:message id="Msg_P1_S" name="Solicitud en lenguaje natural"/>
+  <bpmn:error id="Err_P1_Error" name="Fallo técnico" errorCode="TECHNICAL_FAILURE"/>
+  <bpmn:collaboration id="Collaboration_P1">
+    <bpmn:participant id="Client_P1" name="Cliente corporativo / solicitante"/>
+    <bpmn:participant id="Pool_P1" name="Aqua Clean S.A.C. · P1 · Interpretar y registrar solicitudes de recojo" processRef="Process_P1"/>
+    <bpmn:messageFlow id="P1_M1" sourceRef="Client_P1" targetRef="P1_S">
+      <bpmn:documentation>Solicitud</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P1_M2" sourceRef="P1_Preguntar" targetRef="Client_P1">
+      <bpmn:documentation>Pregunta</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P1_M3" sourceRef="Client_P1" targetRef="P1_Respuesta">
+      <bpmn:documentation>Aclaración</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P1_M4" sourceRef="P1_Resumen" targetRef="Client_P1">
+      <bpmn:documentation>Resumen</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P1_M5" sourceRef="Client_P1" targetRef="P1_Confirmar">
+      <bpmn:documentation>Respuesta</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P1_M6" sourceRef="P1_Informar" targetRef="Client_P1">
+      <bpmn:documentation>Resultado</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P1_M7" sourceRef="P1_Avisar" targetRef="Client_P1">
+      <bpmn:documentation>Estado pendiente</bpmn:documentation>
+    </bpmn:messageFlow>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_P1" name="P1 · Interpretar y registrar solicitudes de recojo" isExecutable="false">
+    <bpmn:documentation>Modelo TO BE propuesto. Los LLM producen propuestas con evidencia; la política, las autorizaciones humanas y los servicios deterministas controlan los cambios. Detalle en el documento del proceso. No es un workflow BPMN ejecutable.</bpmn:documentation>
+    <bpmn:laneSet id="Lanes_P1">
+      <bpmn:lane id="P1_Lane0" name="Agente de atención / supervisor">
+        <bpmn:flowNodeRef>P1_S</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Interpretar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Preguntar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Respuesta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Timeout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Resumen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Confirmar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Acepta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Informar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Avisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_FinPend</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P1_Lane1" name="Servicios, políticas y registro RPA">
+        <bpmn:flowNodeRef>P1_Consultar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Permiso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Registrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Resultado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Pendiente</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P1_Lane2" name="Asesor / administración">
+        <bpmn:flowNodeRef>P1_Humano</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_Autoriza</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P1_FinNo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="P1_S" name="Solicitud en lenguaje natural">
+      <bpmn:outgoing>P1_F01</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Def_P1_S" messageRef="Msg_P1_S"/>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="P1_Interpretar" name="Interpretar intención y extraer campos">
+      <bpmn:documentation>Agente de atención. Extracción con evidencia textual. Nunca completa datos no confirmados.</bpmn:documentation>
+      <bpmn:incoming>P1_F01</bpmn:incoming>
+      <bpmn:incoming>P1_F08</bpmn:incoming>
+      <bpmn:incoming>P1_F13</bpmn:incoming>
+      <bpmn:outgoing>P1_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="P1_Consultar" name="Consultar identidad y padrón autorizado">
+      <bpmn:incoming>P1_F02</bpmn:incoming>
+      <bpmn:outgoing>P1_F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="P1_Datos" name="¿Datos suficientes?" default="P1_F06">
+      <bpmn:incoming>P1_F03</bpmn:incoming>
+      <bpmn:outgoing>P1_F04</bpmn:outgoing>
+      <bpmn:outgoing>P1_F05</bpmn:outgoing>
+      <bpmn:outgoing>P1_F06</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="P1_Preguntar" name="Preguntar por el dato ambiguo o faltante">
+      <bpmn:incoming>P1_F05</bpmn:incoming>
+      <bpmn:outgoing>P1_F07</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:receiveTask id="P1_Respuesta" name="Esperar aclaración del cliente">
+      <bpmn:incoming>P1_F07</bpmn:incoming>
+      <bpmn:outgoing>P1_F08</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:boundaryEvent id="P1_Timeout" name="24 h sin respuesta" attachedToRef="P1_Respuesta" cancelActivity="true">
+      <bpmn:outgoing>P1_F09</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Def_P1_Timeout">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sendTask id="P1_Resumen" name="Presentar resumen con fecha exacta">
+      <bpmn:incoming>P1_F04</bpmn:incoming>
+      <bpmn:incoming>P1_F20</bpmn:incoming>
+      <bpmn:outgoing>P1_F10</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:receiveTask id="P1_Confirmar" name="Recibir confirmación o corrección">
+      <bpmn:incoming>P1_F10</bpmn:incoming>
+      <bpmn:outgoing>P1_F11</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:exclusiveGateway id="P1_Acepta" name="¿Confirma los datos?" default="P1_F15">
+      <bpmn:incoming>P1_F11</bpmn:incoming>
+      <bpmn:outgoing>P1_F12</bpmn:outgoing>
+      <bpmn:outgoing>P1_F13</bpmn:outgoing>
+      <bpmn:outgoing>P1_F14</bpmn:outgoing>
+      <bpmn:outgoing>P1_F15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:businessRuleTask id="P1_Validar" name="Validar contrato, permisos y estado comercial">
+      <bpmn:incoming>P1_F12</bpmn:incoming>
+      <bpmn:outgoing>P1_F16</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="P1_Permiso" name="¿Puede ejecutarse?" default="P1_F18">
+      <bpmn:incoming>P1_F16</bpmn:incoming>
+      <bpmn:outgoing>P1_F17</bpmn:outgoing>
+      <bpmn:outgoing>P1_F18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="P1_Humano" name="Revisar ambigüedad o excepción comercial">
+      <bpmn:incoming>P1_F06</bpmn:incoming>
+      <bpmn:incoming>P1_F14</bpmn:incoming>
+      <bpmn:incoming>P1_F18</bpmn:incoming>
+      <bpmn:outgoing>P1_F19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="P1_Autoriza" name="¿Autoriza y completa datos?" default="P1_F21">
+      <bpmn:incoming>P1_F19</bpmn:incoming>
+      <bpmn:outgoing>P1_F20</bpmn:outgoing>
+      <bpmn:outgoing>P1_F21</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="P1_Registrar" name="Invocar registrar_recojo idempotente">
+      <bpmn:documentation>Servicio determinista. Puede usar el adaptador n8n o el servicio Python. El agente no calcula el identificador del pedido.</bpmn:documentation>
+      <bpmn:incoming>P1_F17</bpmn:incoming>
+      <bpmn:outgoing>P1_F22</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="P1_Error" name="Fallo técnico" attachedToRef="P1_Registrar" cancelActivity="true">
+      <bpmn:outgoing>P1_F25</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="Def_P1_Error" errorRef="Err_P1_Error"/>
+    </bpmn:boundaryEvent>
+    <bpmn:exclusiveGateway id="P1_Resultado" name="¿Resultado del registro?" default="P1_F24">
+      <bpmn:incoming>P1_F22</bpmn:incoming>
+      <bpmn:outgoing>P1_F23</bpmn:outgoing>
+      <bpmn:outgoing>P1_F24</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="P1_Informar" name="Comunicar el resultado real del servicio">
+      <bpmn:incoming>P1_F23</bpmn:incoming>
+      <bpmn:outgoing>P1_F28</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="P1_Fin" name="Solicitud registrada o existente">
+      <bpmn:incoming>P1_F28</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="P1_Pendiente" name="Guardar caso pendiente y motivo">
+      <bpmn:incoming>P1_F09</bpmn:incoming>
+      <bpmn:incoming>P1_F24</bpmn:incoming>
+      <bpmn:incoming>P1_F25</bpmn:incoming>
+      <bpmn:outgoing>P1_F26</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="P1_Avisar" name="Informar revisión sin confirmar el recojo">
+      <bpmn:incoming>P1_F26</bpmn:incoming>
+      <bpmn:outgoing>P1_F27</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="P1_FinPend" name="Caso pendiente de atención">
+      <bpmn:incoming>P1_F27</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="P1_FinNo" name="Solicitud no autorizada o cancelada">
+      <bpmn:incoming>P1_F15</bpmn:incoming>
+      <bpmn:incoming>P1_F21</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="P1_F01" sourceRef="P1_S" targetRef="P1_Interpretar"/>
+    <bpmn:sequenceFlow id="P1_F02" sourceRef="P1_Interpretar" targetRef="P1_Consultar"/>
+    <bpmn:sequenceFlow id="P1_F03" sourceRef="P1_Consultar" targetRef="P1_Datos"/>
+    <bpmn:sequenceFlow id="P1_F04" name="Completos" sourceRef="P1_Datos" targetRef="P1_Resumen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_completos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F05" name="Aclarable (hasta 2 rondas)" sourceRef="P1_Datos" targetRef="P1_Preguntar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">aclarable and rondas &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F06" name="Identidad no resuelta / límite" sourceRef="P1_Datos" targetRef="P1_Humano"/>
+    <bpmn:sequenceFlow id="P1_F07" sourceRef="P1_Preguntar" targetRef="P1_Respuesta"/>
+    <bpmn:sequenceFlow id="P1_F08" name="Aclaración" sourceRef="P1_Respuesta" targetRef="P1_Interpretar"/>
+    <bpmn:sequenceFlow id="P1_F09" name="Sin respuesta" sourceRef="P1_Timeout" targetRef="P1_Pendiente"/>
+    <bpmn:sequenceFlow id="P1_F10" sourceRef="P1_Resumen" targetRef="P1_Confirmar"/>
+    <bpmn:sequenceFlow id="P1_F11" sourceRef="P1_Confirmar" targetRef="P1_Acepta"/>
+    <bpmn:sequenceFlow id="P1_F12" name="Sí" sourceRef="P1_Acepta" targetRef="P1_Validar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_confirmados</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F13" name="Corrección (hasta 2 rondas)" sourceRef="P1_Acepta" targetRef="P1_Interpretar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">correccion and rondas &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F14" name="Límite de corrección" sourceRef="P1_Acepta" targetRef="P1_Humano">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">correccion and rondas &gt;= 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F15" name="Cancelación" sourceRef="P1_Acepta" targetRef="P1_FinNo"/>
+    <bpmn:sequenceFlow id="P1_F16" sourceRef="P1_Validar" targetRef="P1_Permiso"/>
+    <bpmn:sequenceFlow id="P1_F17" name="Permitido" sourceRef="P1_Permiso" targetRef="P1_Registrar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">permiso_valido and datos_confirmados</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F18" name="Requiere revisión" sourceRef="P1_Permiso" targetRef="P1_Humano"/>
+    <bpmn:sequenceFlow id="P1_F19" sourceRef="P1_Humano" targetRef="P1_Autoriza"/>
+    <bpmn:sequenceFlow id="P1_F20" name="Sí; reconfirmar datos" sourceRef="P1_Autoriza" targetRef="P1_Resumen">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">autorizacion_valida and datos_completos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F21" name="No" sourceRef="P1_Autoriza" targetRef="P1_FinNo"/>
+    <bpmn:sequenceFlow id="P1_F22" sourceRef="P1_Registrar" targetRef="P1_Resultado"/>
+    <bpmn:sequenceFlow id="P1_F23" name="Registrado / existente" sourceRef="P1_Resultado" targetRef="P1_Informar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">status in [registrado, ya_registrado]</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F24" name="Derivado / rechazado" sourceRef="P1_Resultado" targetRef="P1_Pendiente"/>
+    <bpmn:sequenceFlow id="P1_F25" sourceRef="P1_Error" targetRef="P1_Pendiente"/>
+    <bpmn:sequenceFlow id="P1_F26" sourceRef="P1_Pendiente" targetRef="P1_Avisar"/>
+    <bpmn:sequenceFlow id="P1_F27" sourceRef="P1_Avisar" targetRef="P1_FinPend"/>
+    <bpmn:sequenceFlow id="P1_F28" sourceRef="P1_Informar" targetRef="P1_Fin"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_P1">
+    <bpmndi:BPMNPlane id="Plane_P1" bpmnElement="Collaboration_P1">
+      <bpmndi:BPMNShape id="Shape_Client_P1" bpmnElement="Client_P1" isHorizontal="true">
+        <dc:Bounds x="50" y="30" width="3600" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Pool_P1" bpmnElement="Pool_P1" isHorizontal="true">
+        <dc:Bounds x="50" y="170" width="3600" height="1080"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Lane0" bpmnElement="P1_Lane0" isHorizontal="true">
+        <dc:Bounds x="80" y="170" width="3570" height="360"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Lane1" bpmnElement="P1_Lane1" isHorizontal="true">
+        <dc:Bounds x="80" y="530" width="3570" height="360"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Lane2" bpmnElement="P1_Lane2" isHorizontal="true">
+        <dc:Bounds x="80" y="890" width="3570" height="360"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_S" bpmnElement="P1_S">
+        <dc:Bounds x="179.0" y="274.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="124" y="326.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Interpretar" bpmnElement="P1_Interpretar">
+        <dc:Bounds x="352.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Consultar" bpmnElement="P1_Consultar">
+        <dc:Bounds x="587.0" y="612.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Datos" bpmnElement="P1_Datos">
+        <dc:Bounds x="878.0" y="268.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="829" y="332.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Preguntar" bpmnElement="P1_Preguntar">
+        <dc:Bounds x="1057.0" y="397.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Respuesta" bpmnElement="P1_Respuesta">
+        <dc:Bounds x="1292.0" y="397.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Timeout" bpmnElement="P1_Timeout">
+        <dc:Bounds x="1409.0" y="462.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1354.0" y="514.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Resumen" bpmnElement="P1_Resumen">
+        <dc:Bounds x="1057.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Confirmar" bpmnElement="P1_Confirmar">
+        <dc:Bounds x="1292.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Acepta" bpmnElement="P1_Acepta">
+        <dc:Bounds x="1583.0" y="268.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1534" y="332.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Validar" bpmnElement="P1_Validar">
+        <dc:Bounds x="1762.0" y="612.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Permiso" bpmnElement="P1_Permiso">
+        <dc:Bounds x="2053.0" y="628.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2004" y="692.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Humano" bpmnElement="P1_Humano">
+        <dc:Bounds x="2232.0" y="972.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Autoriza" bpmnElement="P1_Autoriza">
+        <dc:Bounds x="2523.0" y="988.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2474" y="1052.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Registrar" bpmnElement="P1_Registrar">
+        <dc:Bounds x="2702.0" y="612.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Error" bpmnElement="P1_Error">
+        <dc:Bounds x="2819.0" y="677.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2764.0" y="729.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Resultado" bpmnElement="P1_Resultado">
+        <dc:Bounds x="2993.0" y="628.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2944" y="692.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Informar" bpmnElement="P1_Informar">
+        <dc:Bounds x="3172.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Fin" bpmnElement="P1_Fin">
+        <dc:Bounds x="3469.0" y="274.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3414" y="326.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Pendiente" bpmnElement="P1_Pendiente">
+        <dc:Bounds x="2937.0" y="757.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_Avisar" bpmnElement="P1_Avisar">
+        <dc:Bounds x="3172.0" y="397.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_FinPend" bpmnElement="P1_FinPend">
+        <dc:Bounds x="3469.0" y="419.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3414" y="471.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P1_FinNo" bpmnElement="P1_FinNo">
+        <dc:Bounds x="2999.0" y="994.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2944" y="1046.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_P1_F01" bpmnElement="P1_F01">
+        <di:waypoint x="221.0" y="295.0"/>
+        <di:waypoint x="352.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F02" bpmnElement="P1_F02">
+        <di:waypoint x="518.0" y="295.0"/>
+        <di:waypoint x="548.0" y="295.0"/>
+        <di:waypoint x="548.0" y="655.0"/>
+        <di:waypoint x="587.0" y="655.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F03" bpmnElement="P1_F03">
+        <di:waypoint x="753.0" y="655.0"/>
+        <di:waypoint x="783.0" y="655.0"/>
+        <di:waypoint x="783.0" y="295.0"/>
+        <di:waypoint x="878.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F04" bpmnElement="P1_F04">
+        <di:waypoint x="932.0" y="295.0"/>
+        <di:waypoint x="1057.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="929.5" y="258.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F05" bpmnElement="P1_F05">
+        <di:waypoint x="932.0" y="295.0"/>
+        <di:waypoint x="962.0" y="295.0"/>
+        <di:waypoint x="962.0" y="440.0"/>
+        <di:waypoint x="1057.0" y="440.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="961.0" y="339.5" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F06" bpmnElement="P1_F06">
+        <di:waypoint x="932.0" y="295.0"/>
+        <di:waypoint x="962.0" y="295.0"/>
+        <di:waypoint x="962.0" y="954"/>
+        <di:waypoint x="2207.0" y="954"/>
+        <di:waypoint x="2207.0" y="1015.0"/>
+        <di:waypoint x="2232.0" y="1015.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="964.0" y="926" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F07" bpmnElement="P1_F07">
+        <di:waypoint x="1223.0" y="440.0"/>
+        <di:waypoint x="1292.0" y="440.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F08" bpmnElement="P1_F08">
+        <di:waypoint x="1458.0" y="440.0"/>
+        <di:waypoint x="1480.0" y="440.0"/>
+        <di:waypoint x="1480.0" y="485"/>
+        <di:waypoint x="330.0" y="485"/>
+        <di:waypoint x="330.0" y="295.0"/>
+        <di:waypoint x="352.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="840.0" y="455" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F09" bpmnElement="P1_F09">
+        <di:waypoint x="1451.0" y="483.0"/>
+        <di:waypoint x="1473.0" y="483.0"/>
+        <di:waypoint x="1473.0" y="1230"/>
+        <di:waypoint x="2915.0" y="1230"/>
+        <di:waypoint x="2915.0" y="800.0"/>
+        <di:waypoint x="2937.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2129.0" y="1200" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F10" bpmnElement="P1_F10">
+        <di:waypoint x="1223.0" y="295.0"/>
+        <di:waypoint x="1292.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F11" bpmnElement="P1_F11">
+        <di:waypoint x="1458.0" y="295.0"/>
+        <di:waypoint x="1583.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F12" bpmnElement="P1_F12">
+        <di:waypoint x="1637.0" y="295.0"/>
+        <di:waypoint x="1667.0" y="295.0"/>
+        <di:waypoint x="1667.0" y="655.0"/>
+        <di:waypoint x="1762.0" y="655.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1666.0" y="447.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F13" bpmnElement="P1_F13">
+        <di:waypoint x="1637.0" y="295.0"/>
+        <di:waypoint x="1659.0" y="295.0"/>
+        <di:waypoint x="1659.0" y="510"/>
+        <di:waypoint x="330.0" y="510"/>
+        <di:waypoint x="330.0" y="295.0"/>
+        <di:waypoint x="352.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="929.5" y="480" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F14" bpmnElement="P1_F14">
+        <di:waypoint x="1637.0" y="295.0"/>
+        <di:waypoint x="1667.0" y="295.0"/>
+        <di:waypoint x="1667.0" y="939"/>
+        <di:waypoint x="2207.0" y="939"/>
+        <di:waypoint x="2207.0" y="1015.0"/>
+        <di:waypoint x="2232.0" y="1015.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1669.0" y="911" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F15" bpmnElement="P1_F15">
+        <di:waypoint x="1637.0" y="295.0"/>
+        <di:waypoint x="1659.0" y="295.0"/>
+        <di:waypoint x="1659.0" y="1248"/>
+        <di:waypoint x="2977.0" y="1248"/>
+        <di:waypoint x="2977.0" y="1015.0"/>
+        <di:waypoint x="2999.0" y="1015.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2253.0" y="1218" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F16" bpmnElement="P1_F16">
+        <di:waypoint x="1928.0" y="655.0"/>
+        <di:waypoint x="2053.0" y="655.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F17" bpmnElement="P1_F17">
+        <di:waypoint x="2107.0" y="655.0"/>
+        <di:waypoint x="2137.0" y="655.0"/>
+        <di:waypoint x="2137.0" y="579"/>
+        <di:waypoint x="2677.0" y="579"/>
+        <di:waypoint x="2677.0" y="655.0"/>
+        <di:waypoint x="2702.0" y="655.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2139.0" y="551" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F18" bpmnElement="P1_F18">
+        <di:waypoint x="2107.0" y="655.0"/>
+        <di:waypoint x="2137.0" y="655.0"/>
+        <di:waypoint x="2137.0" y="1015.0"/>
+        <di:waypoint x="2232.0" y="1015.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2136.0" y="807.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F19" bpmnElement="P1_F19">
+        <di:waypoint x="2398.0" y="1015.0"/>
+        <di:waypoint x="2523.0" y="1015.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F20" bpmnElement="P1_F20">
+        <di:waypoint x="2577.0" y="1015.0"/>
+        <di:waypoint x="2599.0" y="1015.0"/>
+        <di:waypoint x="2599.0" y="1200"/>
+        <di:waypoint x="1035.0" y="1200"/>
+        <di:waypoint x="1035.0" y="295.0"/>
+        <di:waypoint x="1057.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1752.0" y="1170" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F21" bpmnElement="P1_F21">
+        <di:waypoint x="2577.0" y="1015.0"/>
+        <di:waypoint x="2607.0" y="1015.0"/>
+        <di:waypoint x="2607.0" y="954"/>
+        <di:waypoint x="2974.0" y="954"/>
+        <di:waypoint x="2974.0" y="1015.0"/>
+        <di:waypoint x="2999.0" y="1015.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2609.0" y="926" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F22" bpmnElement="P1_F22">
+        <di:waypoint x="2868.0" y="655.0"/>
+        <di:waypoint x="2993.0" y="655.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F23" bpmnElement="P1_F23">
+        <di:waypoint x="3047.0" y="655.0"/>
+        <di:waypoint x="3077.0" y="655.0"/>
+        <di:waypoint x="3077.0" y="295.0"/>
+        <di:waypoint x="3172.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3076.0" y="447.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F24" bpmnElement="P1_F24">
+        <di:waypoint x="3020.0" y="682.0"/>
+        <di:waypoint x="3020.0" y="757.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3022.0" y="711.5" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F25" bpmnElement="P1_F25">
+        <di:waypoint x="2861.0" y="698.0"/>
+        <di:waypoint x="2891.0" y="698.0"/>
+        <di:waypoint x="2891.0" y="800.0"/>
+        <di:waypoint x="2937.0" y="800.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F26" bpmnElement="P1_F26">
+        <di:waypoint x="3103.0" y="800.0"/>
+        <di:waypoint x="3133.0" y="800.0"/>
+        <di:waypoint x="3133.0" y="440.0"/>
+        <di:waypoint x="3172.0" y="440.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F27" bpmnElement="P1_F27">
+        <di:waypoint x="3338.0" y="440.0"/>
+        <di:waypoint x="3469.0" y="440.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_F28" bpmnElement="P1_F28">
+        <di:waypoint x="3338.0" y="295.0"/>
+        <di:waypoint x="3469.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_M1" bpmnElement="P1_M1">
+        <di:waypoint x="239.0" y="120"/>
+        <di:waypoint x="239.0" y="295.0"/>
+        <di:waypoint x="221.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_M2" bpmnElement="P1_M2">
+        <di:waypoint x="1223.0" y="440.0"/>
+        <di:waypoint x="1253.0" y="440.0"/>
+        <di:waypoint x="1253.0" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_M3" bpmnElement="P1_M3">
+        <di:waypoint x="1476.0" y="120"/>
+        <di:waypoint x="1476.0" y="440.0"/>
+        <di:waypoint x="1458.0" y="440.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_M4" bpmnElement="P1_M4">
+        <di:waypoint x="1223.0" y="295.0"/>
+        <di:waypoint x="1253.0" y="295.0"/>
+        <di:waypoint x="1253.0" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_M5" bpmnElement="P1_M5">
+        <di:waypoint x="1476.0" y="120"/>
+        <di:waypoint x="1476.0" y="295.0"/>
+        <di:waypoint x="1458.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_M6" bpmnElement="P1_M6">
+        <di:waypoint x="3338.0" y="295.0"/>
+        <di:waypoint x="3368.0" y="295.0"/>
+        <di:waypoint x="3368.0" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P1_M7" bpmnElement="P1_M7">
+        <di:waypoint x="3338.0" y="440.0"/>
+        <di:waypoint x="3356.0" y="440.0"/>
+        <di:waypoint x="3356.0" y="120"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

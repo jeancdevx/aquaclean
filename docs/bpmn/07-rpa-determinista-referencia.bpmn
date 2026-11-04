@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_RecojoToBe" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.28.0">
+  <bpmn:message id="Msg_Solicitud" name="Solicitud de recojo" />
+  <bpmn:error id="Error_Registro" name="Fallo del servicio de registro" errorCode="FALLO_REGISTRO" />
+  <bpmn:collaboration id="Collaboration_ToBe">
+    <bpmn:participant id="Participant_Cliente" name="Cliente corporativo (solicitante)" />
+    <bpmn:participant id="Participant_Lav" name="Lavandería Aqua Clean S.A.C. — Registrar y programar la solicitud de recojo (TO-BE)" processRef="Process_ToBe" />
+    <bpmn:messageFlow id="MF_1" name="Solicitud de recojo (JSON)" sourceRef="Participant_Cliente" targetRef="Start_Solicitud" />
+    <bpmn:messageFlow id="MF_2" name="HTTP 400 · errores del contrato" sourceRef="T_Responder400" targetRef="Participant_Cliente" />
+    <bpmn:messageFlow id="MF_3" name="HTTP 200 · pedido existente" sourceRef="T_Responder200" targetRef="Participant_Cliente" />
+    <bpmn:messageFlow id="MF_4" name="HTTP 202 · pendiente de autorización" sourceRef="T_Responder202" targetRef="Participant_Cliente" />
+    <bpmn:messageFlow id="MF_5" name="Confirmación de fecha y turno" sourceRef="T_Confirmar" targetRef="Participant_Cliente" />
+    <bpmn:messageFlow id="MF_6" name="HTTP 201 · numero_pedido" sourceRef="T_Responder201" targetRef="Participant_Cliente" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_ToBe" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Robot" name="Robot de registro (n8n)">
+        <bpmn:flowNodeRef>T_PrepararColaDatos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ColaFallidosDatos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Responder400</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Rechazada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Responder200</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RegistrarDerivacion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Responder202</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Contrato</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Start_Solicitud</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_BuscarClave</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Normalizar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Duplicado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Padron</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Duplicado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_EstadoCliente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_AsignarTurno</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RegistrarPedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BND_FalloRegistro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_PrepararColaSistema</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ColaFallidosSistema</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Responder500</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_AlertarAsesor</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Responder201</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Confirmar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Registrado</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Asesor" name="Asesor de atención al cliente">
+        <bpmn:flowNodeRef>T_AtenderFallo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Reproceso</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Admin" name="Administración y facturación">
+        <bpmn:flowNodeRef>T_DecidirAtencion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Derivada</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:serviceTask id="T_PrepararColaDatos" name="Preparar la entrada de la cola con los seis campos">
+      <bpmn:incoming>F03</bpmn:incoming>
+      <bpmn:incoming>F19</bpmn:incoming>
+      <bpmn:outgoing>F04</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_ColaFallidosDatos" name="Registrar el rechazo en la cola de fallidos">
+      <bpmn:incoming>F04</bpmn:incoming>
+      <bpmn:outgoing>F05</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_Responder400" name="Responder 400 con el detalle del error">
+      <bpmn:incoming>F05</bpmn:incoming>
+      <bpmn:outgoing>F06</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Rechazada" name="Solicitud rechazada por datos">
+      <bpmn:incoming>F06</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="T_Responder200" name="Responder 200 con el pedido existente">
+      <bpmn:incoming>F10</bpmn:incoming>
+      <bpmn:outgoing>F11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_RegistrarDerivacion" name="Registrar la derivación a administración">
+      <bpmn:incoming>F15</bpmn:incoming>
+      <bpmn:outgoing>F16</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_Responder202" name="Responder 202 · pendiente de autorización">
+      <bpmn:incoming>F16</bpmn:incoming>
+      <bpmn:outgoing>F17</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="T_DecidirAtencion" name="Verificar la deuda y decidir la atención excepcional">
+      <bpmn:incoming>F17</bpmn:incoming>
+      <bpmn:outgoing>F18</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Derivada" name="Caso derivado a administración">
+      <bpmn:incoming>F18</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="T_AtenderFallo" name="Atender la alerta y reprocesar el caso desde la cola">
+      <bpmn:incoming>F28</bpmn:incoming>
+      <bpmn:outgoing>F29</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Reproceso" name="Caso pendiente de reproceso">
+      <bpmn:incoming>F29</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F01" sourceRef="Start_Solicitud" targetRef="T_Validar" />
+    <bpmn:sequenceFlow id="F02" sourceRef="T_Validar" targetRef="G_Contrato" />
+    <bpmn:sequenceFlow id="F03" name="No cumple" sourceRef="G_Contrato" targetRef="T_PrepararColaDatos" />
+    <bpmn:sequenceFlow id="F04" sourceRef="T_PrepararColaDatos" targetRef="T_ColaFallidosDatos" />
+    <bpmn:sequenceFlow id="F05" sourceRef="T_ColaFallidosDatos" targetRef="T_Responder400" />
+    <bpmn:sequenceFlow id="F06" sourceRef="T_Responder400" targetRef="End_Rechazada" />
+    <bpmn:sequenceFlow id="F07" name="Sí cumple" sourceRef="G_Contrato" targetRef="T_Normalizar" />
+    <bpmn:sequenceFlow id="F08" sourceRef="T_Normalizar" targetRef="T_BuscarClave" />
+    <bpmn:sequenceFlow id="F09" sourceRef="T_BuscarClave" targetRef="G_Duplicado" />
+    <bpmn:sequenceFlow id="F10" name="Sí, la clave ya existe" sourceRef="G_Duplicado" targetRef="T_Responder200" />
+    <bpmn:sequenceFlow id="F11" sourceRef="T_Responder200" targetRef="End_Duplicado" />
+    <bpmn:sequenceFlow id="F12" name="No, es un pedido nuevo" sourceRef="G_Duplicado" targetRef="T_Padron" />
+    <bpmn:sequenceFlow id="F13" sourceRef="T_Padron" targetRef="G_EstadoCliente" />
+    <bpmn:sequenceFlow id="F14" name="Habilitado" sourceRef="G_EstadoCliente" targetRef="T_AsignarTurno" />
+    <bpmn:sequenceFlow id="F15" name="Bloqueado por deuda o contrato" sourceRef="G_EstadoCliente" targetRef="T_RegistrarDerivacion" />
+    <bpmn:sequenceFlow id="F16" sourceRef="T_RegistrarDerivacion" targetRef="T_Responder202" />
+    <bpmn:sequenceFlow id="F17" sourceRef="T_Responder202" targetRef="T_DecidirAtencion" />
+    <bpmn:sequenceFlow id="F18" sourceRef="T_DecidirAtencion" targetRef="End_Derivada" />
+    <bpmn:sequenceFlow id="F19" name="No existe en el padrón" sourceRef="G_EstadoCliente" targetRef="T_PrepararColaDatos" />
+    <bpmn:sequenceFlow id="F20" sourceRef="T_AsignarTurno" targetRef="T_RegistrarPedido" />
+    <bpmn:sequenceFlow id="F21" sourceRef="T_RegistrarPedido" targetRef="T_Confirmar" />
+    <bpmn:sequenceFlow id="F22" sourceRef="T_Confirmar" targetRef="T_Responder201" />
+    <bpmn:sequenceFlow id="F23" sourceRef="T_Responder201" targetRef="End_Registrado" />
+    <bpmn:sequenceFlow id="F24" sourceRef="BND_FalloRegistro" targetRef="T_PrepararColaSistema" />
+    <bpmn:sequenceFlow id="F25" sourceRef="T_PrepararColaSistema" targetRef="T_ColaFallidosSistema" />
+    <bpmn:sequenceFlow id="F26" sourceRef="T_ColaFallidosSistema" targetRef="T_Responder500" />
+    <bpmn:sequenceFlow id="F27" sourceRef="T_Responder500" targetRef="T_AlertarAsesor" />
+    <bpmn:sequenceFlow id="F28" sourceRef="T_AlertarAsesor" targetRef="T_AtenderFallo" />
+    <bpmn:sequenceFlow id="F29" sourceRef="T_AtenderFallo" targetRef="End_Reproceso" />
+    <bpmn:exclusiveGateway id="G_Contrato" name="¿La solicitud cumple el contrato?">
+      <bpmn:incoming>F02</bpmn:incoming>
+      <bpmn:outgoing>F03</bpmn:outgoing>
+      <bpmn:outgoing>F07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T_Validar" name="Validar la solicitud contra el contrato">
+      <bpmn:incoming>F01</bpmn:incoming>
+      <bpmn:outgoing>F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="Start_Solicitud" name="Solicitud de recojo recibida">
+      <bpmn:outgoing>F01</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MED_Start_Solicitud" messageRef="Msg_Solicitud" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="T_BuscarClave" name="Consultar si la clave ya existe en el registro">
+      <bpmn:incoming>F08</bpmn:incoming>
+      <bpmn:outgoing>F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_Normalizar" name="Normalizar los datos y calcular la clave del pedido">
+      <bpmn:incoming>F07</bpmn:incoming>
+      <bpmn:outgoing>F08</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="G_Duplicado" name="¿El pedido ya fue registrado?">
+      <bpmn:incoming>F09</bpmn:incoming>
+      <bpmn:outgoing>F10</bpmn:outgoing>
+      <bpmn:outgoing>F12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T_Padron" name="Consultar el padrón de clientes">
+      <bpmn:incoming>F12</bpmn:incoming>
+      <bpmn:outgoing>F13</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Duplicado" name="Pedido ya registrado">
+      <bpmn:incoming>F11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="G_EstadoCliente" name="¿Cuál es la situación comercial del cliente?">
+      <bpmn:incoming>F13</bpmn:incoming>
+      <bpmn:outgoing>F14</bpmn:outgoing>
+      <bpmn:outgoing>F15</bpmn:outgoing>
+      <bpmn:outgoing>F19</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="T_AsignarTurno" name="Asignar el turno de la ruta de recojo">
+      <bpmn:incoming>F14</bpmn:incoming>
+      <bpmn:outgoing>F20</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_RegistrarPedido" name="Registrar el pedido en el control de pedidos">
+      <bpmn:incoming>F20</bpmn:incoming>
+      <bpmn:outgoing>F21</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="BND_FalloRegistro" name="Fallo del servicio de registro" attachedToRef="T_RegistrarPedido">
+      <bpmn:outgoing>F24</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="EED_BND_FalloRegistro" errorRef="Error_Registro" />
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="T_PrepararColaSistema" name="Preparar la entrada de la cola con la carga original">
+      <bpmn:incoming>F24</bpmn:incoming>
+      <bpmn:outgoing>F25</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_ColaFallidosSistema" name="Registrar el fallo en la cola de fallidos">
+      <bpmn:incoming>F25</bpmn:incoming>
+      <bpmn:outgoing>F26</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="T_Responder500" name="Responder 500 sin dar el pedido por registrado">
+      <bpmn:incoming>F26</bpmn:incoming>
+      <bpmn:outgoing>F27</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="T_AlertarAsesor" name="Alertar al asesor del caso pendiente">
+      <bpmn:incoming>F27</bpmn:incoming>
+      <bpmn:outgoing>F28</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:serviceTask id="T_Responder201" name="Responder 201 con el número de pedido">
+      <bpmn:incoming>F22</bpmn:incoming>
+      <bpmn:outgoing>F23</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="T_Confirmar" name="Confirmar al solicitante la fecha y el turno">
+      <bpmn:incoming>F21</bpmn:incoming>
+      <bpmn:outgoing>F22</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="End_Registrado" name="Pedido registrado y confirmado">
+      <bpmn:incoming>F23</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_ToBe">
+      <bpmndi:BPMNShape id="Participant_Cliente_di" bpmnElement="Participant_Cliente" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="3180" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_Lav_di" bpmnElement="Participant_Lav" isHorizontal="true">
+        <dc:Bounds x="160" y="180" width="3180" height="740" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Admin_di" bpmnElement="Lane_Admin" isHorizontal="true">
+        <dc:Bounds x="190" y="740" width="3150" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Asesor_di" bpmnElement="Lane_Asesor" isHorizontal="true">
+        <dc:Bounds x="190" y="560" width="3150" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Robot_di" bpmnElement="Lane_Robot" isHorizontal="true">
+        <dc:Bounds x="190" y="180" width="3150" height="380" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_PrepararColaDatos_di" bpmnElement="T_PrepararColaDatos">
+        <dc:Bounds x="560" y="340" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ColaFallidosDatos_di" bpmnElement="T_ColaFallidosDatos">
+        <dc:Bounds x="720" y="340" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Responder400_di" bpmnElement="T_Responder400">
+        <dc:Bounds x="880" y="340" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Rechazada_di" bpmnElement="End_Rechazada">
+        <dc:Bounds x="1040" y="362" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Responder200_di" bpmnElement="T_Responder200">
+        <dc:Bounds x="1550" y="340" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_RegistrarDerivacion_di" bpmnElement="T_RegistrarDerivacion">
+        <dc:Bounds x="1980" y="340" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Responder202_di" bpmnElement="T_Responder202">
+        <dc:Bounds x="2140" y="340" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_DecidirAtencion_di" bpmnElement="T_DecidirAtencion">
+        <dc:Bounds x="2140" y="790" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Derivada_di" bpmnElement="End_Derivada">
+        <dc:Bounds x="2300" y="812" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_AtenderFallo_di" bpmnElement="T_AtenderFallo">
+        <dc:Bounds x="3070" y="610" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Reproceso_di" bpmnElement="End_Reproceso">
+        <dc:Bounds x="3230" y="632" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Contrato_di" bpmnElement="G_Contrato" isMarkerVisible="true">
+        <dc:Bounds x="470" y="255" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="464" y="200" width="62" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Validar_di" bpmnElement="T_Validar">
+        <dc:Bounds x="310" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Solicitud_di" bpmnElement="Start_Solicitud">
+        <dc:Bounds x="230" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="203" y="298" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_BuscarClave_di" bpmnElement="T_BuscarClave">
+        <dc:Bounds x="1310" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Normalizar_di" bpmnElement="T_Normalizar">
+        <dc:Bounds x="1125" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Duplicado_di" bpmnElement="G_Duplicado" isMarkerVisible="true">
+        <dc:Bounds x="1470" y="255" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1452" y="217.5" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Padron_di" bpmnElement="T_Padron">
+        <dc:Bounds x="1720" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Duplicado_di" bpmnElement="End_Duplicado">
+        <dc:Bounds x="1757" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1751" y="398" width="49" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_EstadoCliente_di" bpmnElement="G_EstadoCliente" isMarkerVisible="true">
+        <dc:Bounds x="1880" y="255" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1872" y="191.5" width="65" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_AsignarTurno_di" bpmnElement="T_AsignarTurno">
+        <dc:Bounds x="2400" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_RegistrarPedido_di" bpmnElement="T_RegistrarPedido">
+        <dc:Bounds x="2575" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_PrepararColaSistema_di" bpmnElement="T_PrepararColaSistema">
+        <dc:Bounds x="2575" y="410" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ColaFallidosSistema_di" bpmnElement="T_ColaFallidosSistema">
+        <dc:Bounds x="2750" y="410" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Responder500_di" bpmnElement="T_Responder500">
+        <dc:Bounds x="2910" y="410" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_AlertarAsesor_di" bpmnElement="T_AlertarAsesor">
+        <dc:Bounds x="3070" y="410" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Responder201_di" bpmnElement="T_Responder201">
+        <dc:Bounds x="2910" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Confirmar_di" bpmnElement="T_Confirmar">
+        <dc:Bounds x="2750" y="240" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Registrado_di" bpmnElement="End_Registrado">
+        <dc:Bounds x="3107" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3082" y="298" width="87" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BND_FalloRegistro_di" bpmnElement="BND_FalloRegistro">
+        <dc:Bounds x="2637" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2614" y="338" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F01_di" bpmnElement="F01">
+        <di:waypoint x="266" y="280" />
+        <di:waypoint x="310" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F02_di" bpmnElement="F02">
+        <di:waypoint x="420" y="280" />
+        <di:waypoint x="470" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F03_di" bpmnElement="F03">
+        <di:waypoint x="495" y="305" />
+        <di:waypoint x="495" y="380" />
+        <di:waypoint x="560" y="380" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="503" y="305" width="53" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F04_di" bpmnElement="F04">
+        <di:waypoint x="670" y="380" />
+        <di:waypoint x="720" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F05_di" bpmnElement="F05">
+        <di:waypoint x="830" y="380" />
+        <di:waypoint x="880" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F06_di" bpmnElement="F06">
+        <di:waypoint x="990" y="380" />
+        <di:waypoint x="1040" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F07_di" bpmnElement="F07">
+        <di:waypoint x="520" y="280" />
+        <di:waypoint x="1125" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="553" y="263" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F08_di" bpmnElement="F08">
+        <di:waypoint x="1235" y="280" />
+        <di:waypoint x="1310" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F09_di" bpmnElement="F09">
+        <di:waypoint x="1420" y="280" />
+        <di:waypoint x="1470" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_di" bpmnElement="F10">
+        <di:waypoint x="1495" y="305" />
+        <di:waypoint x="1495" y="380" />
+        <di:waypoint x="1550" y="380" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1495" y="306" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_di" bpmnElement="F11">
+        <di:waypoint x="1660" y="380" />
+        <di:waypoint x="1757" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12_di" bpmnElement="F12">
+        <di:waypoint x="1520" y="280" />
+        <di:waypoint x="1720" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1518" y="246" width="84" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F13_di" bpmnElement="F13">
+        <di:waypoint x="1830" y="280" />
+        <di:waypoint x="1880" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F14_di" bpmnElement="F14">
+        <di:waypoint x="1930" y="280" />
+        <di:waypoint x="2400" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1935" y="263" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F15_di" bpmnElement="F15">
+        <di:waypoint x="1905" y="305" />
+        <di:waypoint x="1905" y="380" />
+        <di:waypoint x="1980" y="380" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1908" y="303" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F16_di" bpmnElement="F16">
+        <di:waypoint x="2090" y="380" />
+        <di:waypoint x="2140" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F17_di" bpmnElement="F17">
+        <di:waypoint x="2195" y="420" />
+        <di:waypoint x="2195" y="790" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18_di" bpmnElement="F18">
+        <di:waypoint x="2250" y="830" />
+        <di:waypoint x="2300" y="830" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F19_di" bpmnElement="F19">
+        <di:waypoint x="1905" y="305" />
+        <di:waypoint x="1905" y="520" />
+        <di:waypoint x="615" y="520" />
+        <di:waypoint x="615" y="420" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1224" y="486" width="73" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F20_di" bpmnElement="F20">
+        <di:waypoint x="2510" y="280" />
+        <di:waypoint x="2575" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F21_di" bpmnElement="F21">
+        <di:waypoint x="2685" y="280" />
+        <di:waypoint x="2750" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F22_di" bpmnElement="F22">
+        <di:waypoint x="2860" y="280" />
+        <di:waypoint x="2910" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F23_di" bpmnElement="F23">
+        <di:waypoint x="3020" y="280" />
+        <di:waypoint x="3107" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F24_di" bpmnElement="F24">
+        <di:waypoint x="2655" y="338" />
+        <di:waypoint x="2655" y="374" />
+        <di:waypoint x="2625" y="374" />
+        <di:waypoint x="2625" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F25_di" bpmnElement="F25">
+        <di:waypoint x="2685" y="450" />
+        <di:waypoint x="2750" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F26_di" bpmnElement="F26">
+        <di:waypoint x="2860" y="450" />
+        <di:waypoint x="2910" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F27_di" bpmnElement="F27">
+        <di:waypoint x="3020" y="450" />
+        <di:waypoint x="3070" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F28_di" bpmnElement="F28">
+        <di:waypoint x="3125" y="490" />
+        <di:waypoint x="3125" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F29_di" bpmnElement="F29">
+        <di:waypoint x="3180" y="650" />
+        <di:waypoint x="3230" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_1_di" bpmnElement="MF_1">
+        <di:waypoint x="248" y="140" />
+        <di:waypoint x="248" y="262" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="213" y="96" width="70" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_2_di" bpmnElement="MF_2">
+        <di:waypoint x="935" y="340" />
+        <di:waypoint x="935" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="901" y="90" width="57" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_3_di" bpmnElement="MF_3">
+        <di:waypoint x="1605" y="340" />
+        <di:waypoint x="1605" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1569" y="106" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_4_di" bpmnElement="MF_4">
+        <di:waypoint x="2195" y="340" />
+        <di:waypoint x="2195" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2158" y="90" width="64" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_5_di" bpmnElement="MF_5">
+        <di:waypoint x="2805" y="240" />
+        <di:waypoint x="2805" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2769" y="106" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MF_6_di" bpmnElement="MF_6">
+        <di:waypoint x="2965" y="240" />
+        <di:waypoint x="2965" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2931" y="106" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
