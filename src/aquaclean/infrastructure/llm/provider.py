@@ -6,9 +6,13 @@ from typing import Any
 from google import genai
 from google.genai import types
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langsmith import traceable
 
+from aquaclean.agents.chains import chain_input, structured_chain
+from aquaclean.agents.prompts import PROMPT_VERSION
 from aquaclean.config import Settings
 from aquaclean.domain.errors import ProviderUnavailable
+from aquaclean.infrastructure.llm.schema import wire_schema
 
 
 class GeminiProvider:
@@ -20,6 +24,7 @@ class GeminiProvider:
         self.model: Any = None
         self.last_usage: dict = {}
         self.last_call_count = 0
+        self.last_error: dict = {}
         if settings.ai_available:
             key = settings.gemini_api_key.get_secret_value()
             self.client = genai.Client(
@@ -62,14 +67,45 @@ class GeminiProvider:
             async with asyncio.timeout(self.settings.llm_timeout_seconds):
                 # Domain tools are executed by specialist graph nodes; schema output cannot write.
                 self.last_call_count = 0
+                self.last_error = {}
                 attempt_messages = list(messages)
+                chain = structured_chain(self.model, schema, wire_schema=wire_schema(schema))
+                result = {}
                 for _attempt in range(min(2, getattr(self, "remaining_calls", 2))):
                     self.last_call_count += 1
-                    result = await self.model.with_structured_output(
-                        schema, method="json_schema", include_raw=True
-                    ).ainvoke(attempt_messages)
+                    result = await chain.ainvoke(
+                        chain_input(attempt_messages),
+                        config={
+                            "run_name": "LCEL." + schema.__name__,
+                            "metadata": {
+                                "prompt_version": PROMPT_VERSION,
+                                "schema": schema.__name__,
+                                "process": {
+                                    "RoutingDecision": "supervisor",
+                                    "RequestDraft": "P1",
+                                    "ScheduleProposal": "P2",
+                                    "QualityRecommendation": "P3",
+                                    "ResolutionProposal": "P4",
+                                }.get(schema.__name__, "unspecified"),
+                            },
+                        },
+                    )
                     if result.get("parsed") is not None:
-                        break
+                        try:
+                            result["parsed"] = schema.model_validate(result["parsed"])
+                        except ValueError as invalid:
+                            self.last_error = (
+                                {
+                                    "validation_types": [
+                                        e["type"] for e in invalid.errors(include_input=False)
+                                    ]
+                                }
+                                if hasattr(invalid, "errors")
+                                else {"validation": "invalid_schema"}
+                            )
+                            result["parsed"] = None
+                        else:
+                            break
                     attempt_messages = messages + [
                         (
                             "human",
@@ -86,6 +122,11 @@ class GeminiProvider:
                 }
                 return result["parsed"]
         except Exception as exc:
+            self.last_error.update(
+                error_type=type(exc).__name__,
+                schema=schema.__name__,
+                model_calls=self.last_call_count,
+            )
             raise ProviderUnavailable(
                 "Gemini no pudo producir un resultado válido. Revise modelo, credencial, cuota y conectividad; el caso se conserva."
             ) from exc
@@ -108,6 +149,11 @@ class GeminiProvider:
                 "La respuesta de Gemini se interrumpió. Consulte el resultado persistido del caso."
             ) from exc
 
+    @traceable(
+        name="Gemini.perception",
+        run_type="tool",
+        process_inputs=lambda x: {"mime": x.get("mime"), "bytes": len(x.get("content", b""))},
+    )
     async def perceive(self, content: bytes, mime: str) -> str:
         self.require()
         self.last_call_count = 1

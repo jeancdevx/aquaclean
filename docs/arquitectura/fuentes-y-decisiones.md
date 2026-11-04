@@ -1,3 +1,15 @@
+# Decisiones técnicas V2 · 2026-11-04
+
+Se eligió deepagents 0.7.30, cuya metadata PyPI requiere LangChain >=1.4.6, frente a 0.7.31/32 que requieren >=1.4.7. Mantiene el pin LangChain 1.4.6; uv.lock fija el resto. Fuentes primarias: [PyPI 0.7.30](https://pypi.org/project/deepagents/0.7.30/), [create_deep_agent](https://reference.langchain.com/python/deepagents/graph/create_deep_agent), [personalización](https://docs.langchain.com/oss/python/deepagents/customization) y [capacidades del harness](https://docs.langchain.com/oss/python/deepagents/overview). Se comprobó la implementación instalada: planificación opt-in, override FilesystemMiddleware por instancia y perfil sin general-purpose. StateBackend es virtual y no SandboxBackendProtocol.
+
+[Gemini structured output](https://ai.google.dev/gemini-api/docs/generate-content/structured-output) advierte restricciones/complexidad de schema. Se observó 400 con la recepción anidada y límites de generación; se usa schema de serialización simplificado en el adaptador, conservando required/enum/type y validación Pydantic local completa. No se elimina la validación para obtener una captura.
+
+LangSmith 0.14.11 quedó como dependencia directa y soporta address_from_env en su código instalado. Fuentes: [trazado LangChain](https://docs.langchain.com/langsmith/trace-with-langchain), [conceptos](https://docs.langchain.com/langsmith/observability-concepts). La cuenta/workspace no se consultó por falta de clave/sesión; no se asume su tipo. El grafo principal exportado y sus subgrafos no incluyen como nodos visibles todas las operaciones internas del harness P4 invocado dentro de propose; las delegaciones están en su registro de investigación y, cuando se habilite, en LangSmith.
+
+Los apartados siguientes son decisiones históricas V1, sin convertir sus pruebas en resultados nuevos.
+
+---
+
 # Fuentes, alcance y decisiones de diseño
 
 ## Archivos del equipo revisados

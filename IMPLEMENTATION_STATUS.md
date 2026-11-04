@@ -1,3 +1,11 @@
+# Estado actual semana 10 · 2026-11-04, America/Lima
+
+Trabajo local en fix/semana10-alineacion-detalle; V2 vigente. Recepción/ciclo, LCEL, LangGraph/HITL e investigación Deep Agents tienen evidencia previa: 83 pruebas deterministas, 10 evaluaciones Gemini y recorrido real DET-E53D7546AB CLOSED, con fechas conservadas. La corrección vigente del usuario exige trazas reales de LangSmith en plan gratuito; los logs locales no las sustituyen. Se revisó la instrumentación, se preparó consulta directa de trazas existentes y recorrido mínimo con captura real. No hay LANGSMITH_API_KEY, destino/workspace configurado ni sesión CDP autorizada en este entorno: la búsqueda remota no pudo realizarse, no se afirma que no existan trazas y el requisito permanece pendiente. Ver docs/LANGSMITH.md y el manifest actual. No se declara completada la semana 10.
+
+---
+
+Los apartados siguientes son el registro histórico V1, con su fecha original. No se convierten en pruebas nuevas de V2.
+
 # Estado de implementación V1
 
 **Estado actual: V1 local implementada y validada.** Ver el cierre final al pie y `docs/validacion/PRODUCTO_V1.md`. Los cortes anteriores conservan el registro cronológico de problemas ya resueltos.

@@ -69,6 +69,9 @@ export interface Message {
   created_at: string;
 }
 export interface Proposal {
+  reception?: { customer: { existing_id?: string; name?: string; contact?: string }; channel: string; receipt_evidence: string; promised_at?: string; items: { garment: string; quantity: number; weight_kg?: string; service_code: string; observations: string }[] };
+  pickup?: { customer: { existing_id?: string; name?: string }; address: string; day: string; shift: string; declared_volume: string; contact: string };
+  quote?: { total: string; balance: string; advance: string; currency: string; tariff_version: string; promised_at: string };
   commercial_exception_required?: boolean;
   action: string;
   response: string;
@@ -98,6 +101,7 @@ export interface Case {
   proposal?: Proposal;
   proposal_hash?: string;
   order_id?: string;
+  pickup_request_id?: string;
   owner: string;
 }
 export interface Approval {
@@ -114,7 +118,15 @@ export interface Run {
   status: string;
   cancelled: boolean;
 }
+export interface RetailSnapshot {
+  pickup_request?: { id: string; status: string; version: number } | null;
+  items: { id: string; garment: string; quantity: number; service_code: string; amount: string }[];
+  payments: { id: string; amount: string }[];
+  receipts: { id: string; kind: string; payload: Record<string, unknown> }[];
+  balance: string | null;
+}
 export interface Snapshot {
+  retail?: RetailSnapshot;
   case: Case;
   messages: Message[];
   attachments: Attachment[];
@@ -127,6 +139,8 @@ export interface Snapshot {
     status: string;
     version: number;
     fields: Record<string, unknown>;
+    kind?: string;
+    total?: string;
   }[];
   operator_events: {
     id: string;

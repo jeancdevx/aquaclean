@@ -1,114 +1,58 @@
-# Aqua Clean · V1 local
+# Aqua Clean · Pedido de lavandería al detalle V2
 
-Chat de operaciones para atención (P1), logística (P2), calidad (P3) e incidencias (P4). FastAPI, LangChain, subgrafos LangGraph con revisión humana, PostgreSQL 17 + pgvector y Astro/React/TypeScript/Tailwind/shadcn/ui. El frontend usa **pnpm 10.33.2** y una única isla `ChatWorkspace`.
+Demo local sintética del proceso **Gestionar el pedido de lavandería al detalle**: recepción real declarada en mostrador, prendas/servicios, producción e inspección humanas, aviso local, entrega, conformidad, cobro declarado y comprobante de demostración. P1R coordina un recojo previo sin abrir una orden. El alcance corporativo V1 queda en [antecedentes](docs/antecedentes/v1/README.md).
 
-La demo abre sin login con `demo_operator` y una organización sintética fijados en backend. No acredita la identidad de personas reales. Los datos operativos son sintéticos; las referencias públicas CPSC se guardan separadamente y no constituyen políticas de Aqua Clean.
+Monolito modular FastAPI/Python, LangChain/LCEL, LangGraph con HITL/checkpoints PostgreSQL, investigación P4 con Deep Agents SDK, pgvector y Astro/React/TypeScript/Tailwind/shadcn. Actor fijo `demo_operator`, sin login ni selector de roles. No acredita separación de empleados reales. Inter, JetBrains Mono y paleta V1 conservadas.
 
-## Arranque reproducible
-
-Requiere Docker Engine/Desktop y Docker Compose. No necesita Node o Python instalados en el host para ejecutar la aplicación.
+## Arranque Docker
 
 ```bash
 test -f .env || cp .env.example .env
-# Editar .env localmente; no compartir ni publicar su contenido.
+# Configurar GEMINI_API_KEY localmente; nunca compartir .env.
 docker compose config --quiet
 docker compose up --build -d
 docker compose ps
 docker compose exec api python -m aquaclean.cli seed-demo
-docker compose exec api python -m aquaclean.cli seed-history --orders 3000
-docker compose exec api python -m aquaclean.cli import-public-history
 docker compose exec api python -m aquaclean.cli ingest-demo
 docker compose exec api python -m aquaclean.cli verify-vector-store
 docker compose exec api python -m aquaclean.cli smoke-local
 ```
 
-Abrir **http://localhost:8000**. OpenAPI interactivo: **http://localhost:8000/api/docs**; contrato JSON: `/api/openapi.json` y [copia exportada](docs/openapi.json).
+Abrir http://localhost:8000; OpenAPI http://localhost:8000/api/docs. Migraciones aditivas 005–006 conservan V1 como `legacy_v1`, sin fabricar prendas, pesajes ni pagos. Mantener los volúmenes `postgres` y `media`; no usar `down -v`. La migración temporal usa propietario; API/worker usan `aquaclean_runtime` sin DDL. Puertos solo en localhost. Con un volumen existente conservar su credencial; cambiar `.env` no cambia el password almacenado en PostgreSQL.
 
-`config --quiet` valida Compose sin imprimir variables sensibles. `migrate` es temporal: termina con código 0 antes de arrancar API/worker. API, worker y DB tienen healthchecks; la base no publica un puerto en el host. La API escucha únicamente en `127.0.0.1:8000`. Imágenes base y dependencias están fijadas por digest/lockfiles.
+## Recorrido
 
-## Configuración
+1. Pulsar **Atención al detalle** → recepción en mostrador. Cliente nuevo necesita nombre/contacto, sin correo obligatorio. Capturar prendas, cantidades, servicio, pesaje si aplica, observaciones, evidencia y fecha prometida. Adjuntos desde el compositor se pueden vincular a prendas.
+2. **Preparar confirmación** interpreta/explica el formulario y calcula importes con tarifas sintéticas versionadas. La tarjeta no crea cliente/orden/adelanto. Confirmar reanuda el mismo hilo LangGraph y escribe transaccionalmente.
+3. En la orden persistida registrar inicio y fin de procesamiento como hitos humanos. En Actividad → Caso registrar inspección/conformidad; pedir «Revisa calidad y propone liberar esta orden». Aprobar la disposición lleva a READY y a un aviso único en bandeja local.
+4. Coordinar entrega por chat o registrar retiro en mostrador desde la tarjeta. Se exige liberación, receptor y evidencia. Registrar cobro declarado del saldo y conformidad explícita; cerrar genera comprobante **DEMOSTRACIÓN, SIN VALIDEZ FISCAL**. No hay pasarela bancaria ni emisión SUNAT.
+5. Alternativa: solicitud previa de recojo desde el formulario; P2 agenda por `pickup_request_id` sin orden. Declarar recojo efectivo y luego recibir prendas. Solo esa recepción crea ServiceOrder.
+6. P3 puede abrir expediente P4 separado vinculado. Abrirlo desde historial, registrar observación y solicitar investigación. Deep Agents planifica y delega a Evidencias/Procedimientos; su propuesta vuelve al HITL. Plan autorizado no cierra: faltan aceptación, cumplimiento y conformidad posteriores.
 
-Completar en `.env`:
+Ejemplos sintéticos de chat: «Recibí prendas en mostrador de una cliente nueva; ayúdame a registrar la recepción», «Coordina el recojo de esta solicitud», «Revisa la inspección registrada y propone liberar», «Investiga la discrepancia con ambos subagentes y propone un plan sin ejecutarlo». Los datos ausentes se preguntan, nunca se inventan.
 
-| Variable | Uso |
-|---|---|
-| `GEMINI_API_KEY` | Clave solo en backend y worker |
-| `GEMINI_CHAT_MODEL` | Selección comprobada: `gemini-3.5-flash-lite` |
-| `GEMINI_EMBEDDING_MODEL` | `gemini-embedding-001` |
-| `EMBEDDING_DIMENSION` | `768`; el adaptador comprueba dimensión y normaliza L2 |
-| `AUTH_MODE` | `demo_local`; otros perfiles fallan explícitamente |
-| `APP_TIMEZONE` | `America/Lima` |
-| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Propietario de migraciones y base local |
-| Límites `MAX_*`, `WAIT_HOURS`, `SLOT_CAPACITY`, `PILOT_*` | Límites configurables de laboratorio, no políticas empresariales ratificadas |
+## Configuración y límites
 
-Compose construye las conexiones internas a `db`. API/worker usan el rol PostgreSQL `aquaclean_runtime`, sin permisos de superusuario, creación de bases/roles o DDL de negocio. Solo la migración usa el propietario. No cambies el password de un volumen PostgreSQL existente únicamente editando `.env`: PostgreSQL conserva el usuario inicial; cambia su credencial de forma explícita y vuelve a ejecutar la migración.
+`GEMINI_CHAT_MODEL` y embeddings son configurables; construcción de modelos solo en `infrastructure/llm/provider.py`. Sin clave, UI/datos están disponibles y la IA indica indisponibilidad. No hay fake de producción. Tarifario configurable `RETAIL_TARIFF_PATH=config/retail-tariffs-v2.json`, Decimal PEN, versión/hash en cotización. Cambiar tarifa invalida confirmaciones pendientes. Promesa 48 h y alerta de procesamiento 24 h son parámetros de laboratorio; la alerta no interrumpe producción. No hay cierre por silencio ni ventana corporativa postventa aplicada al detalle.
 
-Sin clave, la UI, historial, clientes y archivos siguen accesibles; la IA y embeddings indican indisponibilidad. No existe modo fake en producción. Cambiar modelo/dimensión de embeddings crea otra colección y exige reingesta; no mezcla espacios vectoriales.
+`MAX_MODEL_CALLS=24`, `DEEP_MAX_MODEL_CALLS=16`, `DEEP_TIMEOUT_SECONDS=180` limitan investigación y delegaciones. Deep Agents 0.7.30 recibe modelo inyectado, backend virtual nuevo por caso, solo `read_file` virtual, `write_todos`, `task` y dos lecturas acotadas. Sin disco libre, shell, SQL, pagos o herramientas de cierre. [LangSmith requerido para semana 10](docs/LANGSMITH.md): usar plan gratuito, consultar y reutilizar trazas existentes antes de nuevas inferencias, exportar IDs/URLs reales y capturar su interfaz con Playwright. Falta acceso a la cuenta en este entorno; no se declara cumplido. Los [logs locales](docs/OBSERVABILIDAD_LOCAL.md) solo aportan evidencia auxiliar.
 
-El modelo `gemini-3.8-flash` figuraba disponible y clasificó correctamente, pero mostró errores 429/504 en las pruebas de esta cuenta. `gemini-3.5-flash-lite` pasó las seis modalidades, streaming, contratos y prueba de inyección. El proveedor sigue siendo externo y sujeto a cuota/conectividad. No hay cambio automático de modelo ni proveedor simulado.
-
-## Uso
-
-1. Crear una conversación y seleccionar el cliente demo verificado por el operador, o indicar sus datos en el mensaje. Los códigos no autentican personas.
-2. «Programar un recojo» se puede enviar con solo el cliente seleccionado: Atención pide los datos faltantes, sin exigir un pedido previo. En P1, completar siete campos y revisar la fecha exacta, dirección y contacto. **Confirmar** ejecuta el registro; una sugerencia solo rellena texto.
-3. En P2, elegir una opción calculada. La capacidad y la versión se verifican otra vez al reservar.
-4. Para trabajar otro proceso sobre un pedido existente, abrir su conversación o usar **Actividad → Caso → Vincular pedido verificado** en una conversación creada.
-5. En P3/P4, registrar inspecciones, aceptación, cumplimiento y conformidad mediante formularios de operador. Las tareas físicas no las realiza el agente. Las decisiones sensibles esperan aprobación.
-6. Adjuntar JPG/PNG/WebP, PDF o MP3/WAV. Se valida contenido, tamaño, páginas/duración y acceso; se conserva el original con hash. La observación/transcripción de Gemini se puede corregir y sus campos se confirman antes del comando.
-7. **Cómo se resolvió** y **Actividad/Fuentes** muestran resúmenes públicos y fragmentos realmente recuperados. No contienen pensamiento privado ni prompts del sistema.
-
-Las notificaciones se entregan a una bandeja local del expediente. No se envía correo real. No se emiten pagos ni compensaciones monetarias.
-
-## Históricos y fuentes
-
-- `seed-demo`: dos clientes base; `CLI-0002` está bloqueado para probar revisión comercial. Agenda de 14 días; no sobreescribe reservas.
-- `seed-history --orders 3000`: 150 clientes adicionales, 3.000 pedidos y 12.750 eventos sintéticos, con cronología 2024-10-16–2026-10-08 en el dataset creado. IDs estables, contactos `example.invalid`, marca `synthetic_history_v1`. No genera trazas ficticias de agentes ni notificaciones retrospectivas.
-- `import-public-history`: 151 avisos históricos reales de CPSC (1974-02-15–2026-09-17), con corte 2026-10-16, enlaces oficiales y hashes. Se almacenan en `reference`, nunca como pedidos/expedientes reales de Aqua Clean ni como procedimientos autorizantes.
-- [Procedencia y actualización](docs/FUENTES_Y_DATOS.md). El snapshot permite reconstruir la misma base sin volver a consultar una API pública que puede cambiar.
-
-## Desarrollo y pruebas
+## Desarrollo y validación
 
 ```bash
 uv sync --frozen
-uv run ruff check src tests scripts
-uv run ruff format --check src tests scripts
-uv run mypy
-uv run pytest
+uv run python scripts/write_build_revision.py  # metadatos del código que se copiará en Docker
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy  # dominio, schemas y configuración; alcance explícito en pyproject.toml
+# TEST_DATABASE_URL debe terminar en _test; nunca usar la base demo.
+uv run pytest -m 'not real_provider'
 pnpm --dir web install --frozen-lockfile
 pnpm --dir web check
 pnpm --dir web build
-pnpm --dir web exec playwright install chromium
-pnpm --dir web test:ui
+pnpm --dir web exec playwright test
+# Evaluaciones facturables, separadas:
+RUN_REAL_PROVIDER=1 uv run pytest tests/evaluations -m real_provider
 ```
 
-Las pruebas de integración requieren `TEST_DATABASE_URL` explícita, en una **base separada cuyo nombre termine en `_test`**. [Guía detallada](docs/GUIA_PRUEBAS_DETALLADA.md) explica cómo crearla sin exponer PostgreSQL ni tocar el volumen demo. Sin esa variable se omiten con motivo; no se confunden con pruebas pasadas. Los fakes solo se importan desde `tests/` y sus vectores se identifican por modelo `fake-test-only-sha256`.
-
-Pruebas facturables con Gemini real:
-
-```bash
-RUN_REAL_PROVIDER=1 uv run pytest tests/evaluations -v
-RUN_REAL_PROVIDER=1 pnpm --dir web test:ui
-uv run python scripts/run_demo.py --restart
-```
-
-Para desarrollo web, `pnpm --dir web dev` usa proxy explícito de `/api/` hacia FastAPI. El perfil servido por Docker no necesita un servidor Node permanente. Las fuentes Inter/JetBrains Mono se empaquetan con el build y no dependen de Google Fonts.
-
-## Persistencia y recuperación
-
-```bash
-docker compose restart api worker
-docker compose down
-docker compose up -d
-```
-
-Los volúmenes nombrados conservan negocio, chat, aprobaciones, checkpoints, vectores y adjuntos. No eliminar volúmenes para recuperarse de errores ordinarios. Los trabajos pendientes llevan leases y se recuperan; las escrituras usan ledger, IDs estables, restricción única, versiones y transacción. Reconectar SSE solo lee eventos. Detener una respuesta no revierte una operación ya confirmada.
-
-## Documentación de entrega
-
-- [Guía detallada de pruebas, prompts y escenarios históricos](docs/GUIA_PRUEBAS_DETALLADA.md), también en [PDF de 16 páginas](docs/GUIA_PRUEBAS_DETALLADA.pdf) y [HTML](docs/GUIA_PRUEBAS_DETALLADA.html).
-- [Arquitectura implementada](docs/arquitectura/IMPLEMENTADA.md) y [matriz BPMN–código](docs/arquitectura/MATRIZ_BPMN_CODIGO.md).
-- [Seguridad, prompts y límites](docs/SEGURIDAD.md).
-- [Resultados reales y limitaciones](docs/validacion/PRODUCTO_V1.md).
-- [Estado por cortes](IMPLEMENTATION_STATUS.md).
-
-El perfil autenticado de producción, identidad de empleados reales, datos operativos reales de Aqua Clean, políticas ratificadas, pagos y correo externo no forman parte de esta demo. La aplicación no controla máquinas ni acredita la veracidad de una tarea física: conserva la declaración del operador y exige las autorizaciones del flujo.
+Solo pnpm y pnpm-lock.yaml en frontend. [Contratos](docs/contratos/DETALLE_V2.md), [plan vigente](docs/PLAN_ARQUITECTURA.md), [descripciones](docs/DESCRIPCIONES_PROCESOS.md), [arquitectura](docs/arquitectura/IMPLEMENTADA.md), [matriz BPMN–código–prueba](docs/arquitectura/MATRIZ_BPMN_CODIGO.md), [guía actual](docs/GUIA_PRUEBAS_DETALLADA.md). Los XML BPMN descriptivos no son ejecutados por LangGraph. Los resultados V1 conservan fecha/commit; los nuevos resultados y omisiones se entregan en `artifacts/semana10/` y el ZIP.

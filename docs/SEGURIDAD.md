@@ -1,3 +1,13 @@
+# Alcance de seguridad V2 al detalle
+
+2026-11-04, America/Lima. Rigen contratos/DETALLE_V2.md y arquitectura/IMPLEMENTADA.md. Nuevos clientes requieren contacto mínimo sin correo universal. Tarifas/pagos declarados Decimal y comprobantes demo no ejecutan banco ni SUNAT. Deep Agents solo dispone de lecturas acotadas a una orden autorizada y procedimientos vigentes: sin host, shell, SQL libre, pagos, cambios de permisos o cierre directo. Backend virtual fresco, presupuesto y validación de citas/evidencia antes de HITL. IDs de evidencia vinculada se validan dentro de la misma orden/organización/cliente; no otros pedidos.
+
+LangSmith es opcional en operación y externo: clave solo backend/worker, destino proyecto O agente, región/workspace correctos. Sin credenciales se registra pendiente. Exportaciones de observabilidad usan IDs reales del SDK y omiten claves/cookies/storageState/HAR. Los artefactos contienen exclusivamente datos sintéticos y extractos públicos. Actor demo fijo reúne roles; no acredita separación de empleados reales ni autenticación del cliente. La conformidad y las tareas físicas se declaran expresamente por personas.
+
+Lo siguiente conserva la política base V1; las referencias a siete campos/pedidos corporativos corresponden al adaptador legado. No prueban el alcance al detalle ni sustituyen los contratos V2.
+
+---
+
 # Seguridad del perfil local y de los agentes
 
 Este perfil es una demostración local, con un único actor fijo `demo_operator` y todas las capacidades de demostración. El acceso se limita al loopback del host. No implementa autenticación real de empleados, separación de funciones entre personas, MFA, cifrado de disco ni una certificación de seguridad. Las pruebas verifican controles concretos; no garantizan seguridad absoluta ni resistencia a toda inyección futura.

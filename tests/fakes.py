@@ -33,8 +33,17 @@ class FakeProvider:
         self.action = "register"
         self.fail = False
         self.overrides = {}
+        from tests.controlled_deep_model import ControlledDeepModel
+
+        self.model = ControlledDeepModel()
+        self.deep_profile_key = "controlleddeepmodel:controlled-deep-test"
+
+    def require(self):
+        if self.fail:
+            raise ProviderUnavailable()
 
     async def structured(self, schema, messages, tools=None):
+        self.last_call_count = 1
         if self.fail:
             raise ProviderUnavailable("Proveedor caído (fake de prueba explícito)")
         if schema is RoutingDecision:

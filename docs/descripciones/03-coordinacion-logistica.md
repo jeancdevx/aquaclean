@@ -1,3 +1,5 @@
+> Antecedente V1 corporativo, superado para el alcance seleccionado. Versión vigente: [descripciones V2](../DESCRIPCIONES_PROCESOS.md). Original conservado en [antecedentes](../antecedentes/v1/descripciones/03-coordinacion-logistica.md).
+
 # P2. Coordinar recojos, entregas y reprogramaciones
 
 **Diagrama:** `bpmn/03-to-be-coordinacion-logistica.bpmn`. **Proceso:** `Process_P2`. **Especialista:** agente de logística. **Responsable humano:** asesor y responsable de logística.

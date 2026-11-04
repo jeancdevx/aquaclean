@@ -4,12 +4,14 @@ from pathlib import Path
 from uuid import UUID, uuid5
 
 from langgraph.types import Command
+from langsmith import traceable
 
 from aquaclean.bootstrap import bootstrap
 from aquaclean.domain.errors import DomainError
 from aquaclean.graphs.main import build_graph
+from aquaclean.infrastructure.observability.tracing import correlate, metadata, record_outcome
 from aquaclean.infrastructure.persistence.checkpointer import checkpointer
-from aquaclean.workers.outbox import deliver, expire
+from aquaclean.workers.outbox import deliver, expire, processing_alerts
 
 logger = logging.getLogger("aquaclean.worker")
 
@@ -39,9 +41,15 @@ async def heartbeat(runtime, run_id):
         )
 
 
+@traceable(
+    name="AquaClean.application_run",
+    process_inputs=lambda _: {"synthetic": True},
+    process_outputs=lambda _: {"finished": True},
+)
 async def process_run(runtime, run):
     rid, cid = str(run["id"]), str(run["case_id"])
     runtime.current_run_id = rid
+    await correlate(runtime, run)
     task = asyncio.create_task(heartbeat(runtime, rid))
     try:
         await runtime.repo.case(runtime.actor, cid)
@@ -69,6 +77,8 @@ async def process_run(runtime, run):
                             "thread_id": f"org:{runtime.actor.organization_id}:case:{cid}"
                         },
                         "recursion_limit": 30,
+                        "run_name": "AquaClean.LangGraph",
+                        "metadata": metadata(runtime, run),
                     }
                     data = run["input"]
                     snapshot = await graph.aget_state(config)
@@ -129,6 +139,7 @@ async def process_run(runtime, run):
                                 "execution_run_id": rid,
                                 "text": data.get("text", ""),
                                 "attachment_ids": data.get("attachment_ids", []),
+                                "retail_draft": data.get("retail_draft", {}),
                                 "model_calls": 0,
                                 "proposal": {},
                                 "approval": {},
@@ -159,9 +170,14 @@ async def process_run(runtime, run):
                         "UPDATE app.runs SET status=%s,finished_at=now(),lease_until=NULL WHERE id=%s",
                         ("paused" if paused else "completed", rid),
                     )
+                    record_outcome(
+                        "paused" if paused else "completed",
+                        result.get("approval", {}).get("id"),
+                    )
             finally:
                 await lock_conn.execute("SELECT pg_advisory_unlock(hashtextextended(%s,1))", (cid,))
     except Exception as exc:
+        record_outcome("failed")
         # No provider exception text is logged: some SDKs include URLs or request content.
         message = (
             str(exc)
@@ -193,7 +209,15 @@ async def process_run(runtime, run):
             {"error": code, "result": committed["result"] if committed else {}},
         )
         await runtime.repo.event(
-            rid, cid, "run.failed", {"status": "failed", "code": code, "message": message}
+            rid,
+            cid,
+            "run.failed",
+            {
+                "status": "failed",
+                "code": code,
+                "message": message,
+                "diagnostics": getattr(runtime.provider, "last_error", {}),
+            },
         )
         logger.warning("run %s failed (%s)", rid, code)
     finally:
@@ -210,6 +234,9 @@ async def main():
             Path("/tmp/aquaclean-worker-heartbeat").touch()
             await deliver(runtime.repo.db)
             await expire(runtime.repo.db)
+            await processing_alerts(
+                runtime.repo.db, runtime.clock, runtime.settings.processing_alert_hours
+            )
             run = await claim(runtime)
             if run:
                 await process_run(runtime, run)

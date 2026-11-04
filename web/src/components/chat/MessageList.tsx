@@ -11,12 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { AttachmentPreview } from "./AttachmentPreview";
 import { ApprovalCard } from "./ApprovalCard";
+import { RetailOrderCard } from "./RetailPanel";
 import type { Run, Snapshot } from "@/lib/event-types";
 
 const suggestions = [
+  { title: "Recibir prendas en mostrador", description: "Cliente nuevo o existente, sin pedido previo", icon: ClipboardCheck, text: "Recibí prendas en mostrador de un cliente nuevo. Ayúdame a registrar la recepción al detalle, sin recojo previo." },
   {
     title: "Programar un recojo",
-    description: "Preparar y confirmar una solicitud",
+    description: "Solicitud logística previa, todavía sin orden",
     icon: Truck,
     text: "Quiero programar un recojo. Ayúdame a revisar los datos necesarios.",
   },
@@ -225,6 +227,7 @@ export function MessageList({
               </article>
             ))
           )}
+          {snapshot && <RetailOrderCard snapshot={snapshot} onSaved={onSaved} onError={onError} />}
           {snapshot && review && (
             <ApprovalCard
               key={review.id + review.status}

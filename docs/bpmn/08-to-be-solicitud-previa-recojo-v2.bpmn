@@ -1,0 +1,287 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ac="https://aquaclean.example/bpmn/v2" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Def_P1R" targetNamespace="https://aquaclean.example/bpmn/v2" exporter="Aqua Clean especificación alineada V2" exporterVersion="2.0">
+  <bpmn:collaboration id="Coll_P1R">
+    <bpmn:participant id="Pool_P1R" name="Aqua Clean · P1R · Interpretar solicitud previa de recojo" processRef="Process_P1R"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_P1R" name="P1R · Interpretar solicitud previa de recojo" isExecutable="false">
+    <bpmn:documentation>TO BE propuesto V2 para lavandería al detalle. No acredita código ejecutado. Personas verifican prendas; IA propone; servicios validan y escriben. Descripciones y condiciones en PLAN_ALINEADO_V2.md y DESCRIPCIONES_TO_BE_V2.md. Parámetros de laboratorio no equivalen a políticas ratificadas.</bpmn:documentation>
+    <bpmn:laneSet id="Lanes_P1R">
+      <bpmn:lane id="P1R_Lane0" name="Operador y cliente · verificación humana">
+        <bpmn:flowNodeRef>Q_S</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Aclarar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Confirmar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Acepta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Pend</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_FinPend</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P1R_Lane1" name="Agentes y subprocesos de apoyo">
+        <bpmn:flowNodeRef>Q_Interpretar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Resumen</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P1R_Lane2" name="Servicios deterministas y persistencia">
+        <bpmn:flowNodeRef>Q_Percibir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Datos</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Registrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Q_Fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Q_S" name="Mensaje solicita recojo previo">
+      <bpmn:outgoing>P1R_F00</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Q_Percibir" name="Percibir texto imagen PDF o audio">
+      <bpmn:incoming>P1R_F00</bpmn:incoming>
+      <bpmn:outgoing>P1R_F01</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Q_Interpretar" name="Atención extrae contacto dirección fecha y volumen">
+      <bpmn:incoming>P1R_F01</bpmn:incoming>
+      <bpmn:incoming>P1R_F06</bpmn:incoming>
+      <bpmn:outgoing>P1R_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Q_Datos" name="¿Datos suficientes?" default="P1R_F05">
+      <bpmn:incoming>P1R_F02</bpmn:incoming>
+      <bpmn:outgoing>P1R_F03</bpmn:outgoing>
+      <bpmn:outgoing>P1R_F04</bpmn:outgoing>
+      <bpmn:outgoing>P1R_F05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Q_Aclarar" name="Responder aclaración sin inventar datos">
+      <bpmn:incoming>P1R_F04</bpmn:incoming>
+      <bpmn:incoming>P1R_F10</bpmn:incoming>
+      <bpmn:outgoing>P1R_F06</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Q_Resumen" name="Presentar resumen de solicitud logística">
+      <bpmn:incoming>P1R_F03</bpmn:incoming>
+      <bpmn:outgoing>P1R_F07</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Q_Confirmar" name="Confirmar o corregir datos">
+      <bpmn:incoming>P1R_F07</bpmn:incoming>
+      <bpmn:outgoing>P1R_F08</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Q_Acepta" name="¿Confirmado?" default="P1R_F11">
+      <bpmn:incoming>P1R_F08</bpmn:incoming>
+      <bpmn:outgoing>P1R_F09</bpmn:outgoing>
+      <bpmn:outgoing>P1R_F10</bpmn:outgoing>
+      <bpmn:outgoing>P1R_F11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:businessRuleTask id="Q_Validar" name="Validar datos alcance y versión">
+      <bpmn:incoming>P1R_F09</bpmn:incoming>
+      <bpmn:outgoing>P1R_F12</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:serviceTask id="Q_Registrar" name="Registrar PickupRequest idempotente sin crear orden">
+      <bpmn:incoming>P1R_F12</bpmn:incoming>
+      <bpmn:outgoing>P1R_F13</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Q_Fin" name="Solicitud lista para P2">
+      <bpmn:incoming>P1R_F13</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Q_Pend" name="Guardar pendiente con responsable">
+      <bpmn:incoming>P1R_F05</bpmn:incoming>
+      <bpmn:incoming>P1R_F11</bpmn:incoming>
+      <bpmn:outgoing>P1R_F14</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Q_FinPend" name="Sin orden de servicio">
+      <bpmn:incoming>P1R_F14</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="P1R_F00" sourceRef="Q_S" targetRef="Q_Percibir"/>
+    <bpmn:sequenceFlow id="P1R_F01" sourceRef="Q_Percibir" targetRef="Q_Interpretar"/>
+    <bpmn:sequenceFlow id="P1R_F02" sourceRef="Q_Interpretar" targetRef="Q_Datos"/>
+    <bpmn:sequenceFlow id="P1R_F03" sourceRef="Q_Datos" targetRef="Q_Resumen" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_suficientes</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1R_F04" sourceRef="Q_Datos" targetRef="Q_Aclarar" name="Aclarable">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">rondas &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1R_F05" sourceRef="Q_Datos" targetRef="Q_Pend" name="Límite"/>
+    <bpmn:sequenceFlow id="P1R_F06" sourceRef="Q_Aclarar" targetRef="Q_Interpretar"/>
+    <bpmn:sequenceFlow id="P1R_F07" sourceRef="Q_Resumen" targetRef="Q_Confirmar"/>
+    <bpmn:sequenceFlow id="P1R_F08" sourceRef="Q_Confirmar" targetRef="Q_Acepta"/>
+    <bpmn:sequenceFlow id="P1R_F09" sourceRef="Q_Acepta" targetRef="Q_Validar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_confirmados</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1R_F10" sourceRef="Q_Acepta" targetRef="Q_Aclarar" name="Corrección">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">correccion and rondas &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1R_F11" sourceRef="Q_Acepta" targetRef="Q_Pend" name="Rechazo"/>
+    <bpmn:sequenceFlow id="P1R_F12" sourceRef="Q_Validar" targetRef="Q_Registrar"/>
+    <bpmn:sequenceFlow id="P1R_F13" sourceRef="Q_Registrar" targetRef="Q_Fin"/>
+    <bpmn:sequenceFlow id="P1R_F14" sourceRef="Q_Pend" targetRef="Q_FinPend"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_P1R">
+    <bpmndi:BPMNPlane id="Plane_P1R" bpmnElement="Coll_P1R">
+      <bpmndi:BPMNShape id="Pool_P1R_DI" bpmnElement="Pool_P1R" isHorizontal="true">
+        <dc:Bounds x="40" y="100" width="2680" height="1090"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P1R_Lane0_DI" bpmnElement="P1R_Lane0" isHorizontal="true">
+        <dc:Bounds x="70" y="100" width="2650" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P1R_Lane1_DI" bpmnElement="P1R_Lane1" isHorizontal="true">
+        <dc:Bounds x="70" y="350" width="2650" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P1R_Lane2_DI" bpmnElement="P1R_Lane2" isHorizontal="true">
+        <dc:Bounds x="70" y="600" width="2650" height="590"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_S_DI" bpmnElement="Q_S" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="130" y="204.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="95" y="248.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Percibir_DI" bpmnElement="Q_Percibir" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="320" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Interpretar_DI" bpmnElement="Q_Interpretar" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="510" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Datos_DI" bpmnElement="Q_Datos" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="700" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="665" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Aclarar_DI" bpmnElement="Q_Aclarar" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="890" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Resumen_DI" bpmnElement="Q_Resumen" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="1080" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Confirmar_DI" bpmnElement="Q_Confirmar" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="1270" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Acepta_DI" bpmnElement="Q_Acepta" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="1460" y="197.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1425" y="255.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Validar_DI" bpmnElement="Q_Validar" bioc:fill="#E0F2FE" bioc:stroke="#334155">
+        <dc:Bounds x="1650" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Registrar_DI" bpmnElement="Q_Registrar" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="1840" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Fin_DI" bpmnElement="Q_Fin" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="2030" y="704.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1995" y="748.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_Pend_DI" bpmnElement="Q_Pend" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="2220" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Q_FinPend_DI" bpmnElement="Q_FinPend" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="2410" y="204.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2375" y="248.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="P1R_F00_DI" bpmnElement="P1R_F00">
+        <di:waypoint x="166" y="222.0"/>
+        <di:waypoint x="243.0" y="222.0"/>
+        <di:waypoint x="243.0" y="722.0"/>
+        <di:waypoint x="320" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F01_DI" bpmnElement="P1R_F01">
+        <di:waypoint x="470" y="722.0"/>
+        <di:waypoint x="490.0" y="722.0"/>
+        <di:waypoint x="490.0" y="472.0"/>
+        <di:waypoint x="510" y="472.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F02_DI" bpmnElement="P1R_F02">
+        <di:waypoint x="660" y="472.0"/>
+        <di:waypoint x="680.0" y="472.0"/>
+        <di:waypoint x="680.0" y="722.0"/>
+        <di:waypoint x="700" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F03_DI" bpmnElement="P1R_F03">
+        <di:waypoint x="725.0" y="747.0"/>
+        <di:waypoint x="725.0" y="901"/>
+        <di:waypoint x="1155.0" y="901"/>
+        <di:waypoint x="1155.0" y="514.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="728.0" y="904" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F04_DI" bpmnElement="P1R_F04">
+        <di:waypoint x="750" y="722.0"/>
+        <di:waypoint x="820.0" y="722.0"/>
+        <di:waypoint x="820.0" y="222.0"/>
+        <di:waypoint x="890" y="222.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="823.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F05_DI" bpmnElement="P1R_F05">
+        <di:waypoint x="725.0" y="747.0"/>
+        <di:waypoint x="725.0" y="915"/>
+        <di:waypoint x="2295.0" y="915"/>
+        <di:waypoint x="2295.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="728.0" y="918" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F06_DI" bpmnElement="P1R_F06">
+        <di:waypoint x="965.0" y="264.0"/>
+        <di:waypoint x="965.0" y="922"/>
+        <di:waypoint x="585.0" y="922"/>
+        <di:waypoint x="585.0" y="514.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F07_DI" bpmnElement="P1R_F07">
+        <di:waypoint x="1230" y="472.0"/>
+        <di:waypoint x="1250.0" y="472.0"/>
+        <di:waypoint x="1250.0" y="222.0"/>
+        <di:waypoint x="1270" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F08_DI" bpmnElement="P1R_F08">
+        <di:waypoint x="1420" y="222.0"/>
+        <di:waypoint x="1440.0" y="222.0"/>
+        <di:waypoint x="1440.0" y="222.0"/>
+        <di:waypoint x="1460" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F09_DI" bpmnElement="P1R_F09">
+        <di:waypoint x="1510" y="222.0"/>
+        <di:waypoint x="1580.0" y="222.0"/>
+        <di:waypoint x="1580.0" y="722.0"/>
+        <di:waypoint x="1650" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1583.0" y="225.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F10_DI" bpmnElement="P1R_F10">
+        <di:waypoint x="1485.0" y="247.0"/>
+        <di:waypoint x="1485.0" y="950"/>
+        <di:waypoint x="965.0" y="950"/>
+        <di:waypoint x="965.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1488.0" y="953" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F11_DI" bpmnElement="P1R_F11">
+        <di:waypoint x="1485.0" y="247.0"/>
+        <di:waypoint x="1485.0" y="957"/>
+        <di:waypoint x="2295.0" y="957"/>
+        <di:waypoint x="2295.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1488.0" y="960" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F12_DI" bpmnElement="P1R_F12">
+        <di:waypoint x="1800" y="722.0"/>
+        <di:waypoint x="1820.0" y="722.0"/>
+        <di:waypoint x="1820.0" y="722.0"/>
+        <di:waypoint x="1840" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F13_DI" bpmnElement="P1R_F13">
+        <di:waypoint x="1990" y="722.0"/>
+        <di:waypoint x="2010.0" y="722.0"/>
+        <di:waypoint x="2010.0" y="722.0"/>
+        <di:waypoint x="2030" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1R_F14_DI" bpmnElement="P1R_F14">
+        <di:waypoint x="2370" y="222.0"/>
+        <di:waypoint x="2390.0" y="222.0"/>
+        <di:waypoint x="2390.0" y="222.0"/>
+        <di:waypoint x="2410" y="222.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

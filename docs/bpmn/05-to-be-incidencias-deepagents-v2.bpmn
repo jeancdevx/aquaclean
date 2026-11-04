@@ -1,0 +1,537 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ac="https://aquaclean.example/bpmn/v2" id="Definitions_P4" targetNamespace="https://aquaclean.example/bpmn/v2" exporter="Aqua Clean - diseño académico BPMN 2.0" exporterVersion="2.0"><bpmn:error id="Err_P4_Error" name="Fallo técnico" errorCode="TECHNICAL_FAILURE"/>
+  <bpmn:collaboration id="Collaboration_P4">
+    <bpmn:participant id="Client_P4" name="Cliente corporativo / solicitante"/>
+    <bpmn:participant id="Pool_P4" name="Aqua Clean S.A.C. · P4 · Investigar y resolver reclamos e incidencias" processRef="Process_P4"/>
+    <bpmn:messageFlow id="P4_M1" sourceRef="P4_Solicitar" targetRef="Client_P4">
+      <bpmn:documentation>Solicitud de evidencia</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P4_M2" sourceRef="Client_P4" targetRef="P4_Respuesta">
+      <bpmn:documentation>Documentos</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P4_M3" sourceRef="P4_Proponer" targetRef="Client_P4">
+      <bpmn:documentation>Solución aprobada</bpmn:documentation>
+    </bpmn:messageFlow>
+    <bpmn:messageFlow id="P4_M4" sourceRef="Client_P4" targetRef="P4_Elegir">
+      <bpmn:documentation>Aceptación</bpmn:documentation>
+    </bpmn:messageFlow>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_P4" name="P4 · Investigar incidencias con Deep Agents y control humano" isExecutable="false">
+    <bpmn:documentation>Especificación TO BE V2 propuesta para lavandería al detalle. Modelo TO BE propuesto. Los LLM producen propuestas con evidencia; la política, las autorizaciones humanas y los servicios deterministas controlan los cambios. Detalle en el documento del proceso. No es un workflow BPMN ejecutable. Se aplican PLAN_ALINEADO_V2.md y DESCRIPCIONES_TO_BE_V2.md. No acredita implementación del SDK Deep Agents o LangSmith en el commit auditado.</bpmn:documentation>
+    <bpmn:laneSet id="Lanes_P4">
+      <bpmn:lane id="P4_Lane0" name="Agente de incidencias / supervisor">
+        <bpmn:flowNodeRef>P4_Analizar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Suficiente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Solicitar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Respuesta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Timeout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Alternativas</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Proponer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Elegir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Timeout2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Acepta</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P4_Lane1" name="Servicios de expediente y política">
+        <bpmn:flowNodeRef>P4_S</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Expediente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Politica</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Pendiente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_FinPend</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Ejecutar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Cerrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P4_Lane2" name="Asesor / administración">
+        <bpmn:flowNodeRef>P4_Humano</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Aprobada</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Cumplimiento</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>P4_Cumple</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="P4_S" name="Reclamo o incidencia registrado">
+      <bpmn:outgoing>P4_F01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="P4_Expediente" name="Consolidar guía, mensajes e historial autorizado">
+      <bpmn:incoming>P4_F01</bpmn:incoming>
+      <bpmn:incoming>P4_F08</bpmn:incoming>
+      <bpmn:outgoing>P4_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="P4_Analizar" name="Deep Agent planifica y delega investigación de hechos">
+      <bpmn:incoming>P4_F02</bpmn:incoming>
+      <bpmn:outgoing>P4_F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="P4_Suficiente" name="¿Evidencia suficiente?" default="P4_F06">
+      <bpmn:incoming>P4_F03</bpmn:incoming>
+      <bpmn:outgoing>P4_F04</bpmn:outgoing>
+      <bpmn:outgoing>P4_F05</bpmn:outgoing>
+      <bpmn:outgoing>P4_F06</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="P4_Solicitar" name="Solicitar evidencia concreta faltante">
+      <bpmn:incoming>P4_F05</bpmn:incoming>
+      <bpmn:outgoing>P4_F07</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:receiveTask id="P4_Respuesta" name="Esperar documentos o respuesta">
+      <bpmn:incoming>P4_F07</bpmn:incoming>
+      <bpmn:outgoing>P4_F08</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:boundaryEvent id="P4_Timeout" name="24 h sin evidencia" attachedToRef="P4_Respuesta" cancelActivity="true">
+      <bpmn:outgoing>P4_F09</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Def_P4_Timeout">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="P4_Alternativas" name="Subagentes Evidencias y Procedimientos sustentan alternativas">
+      <bpmn:incoming>P4_F04</bpmn:incoming>
+      <bpmn:incoming>P4_F19</bpmn:incoming>
+      <bpmn:outgoing>P4_F10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:businessRuleTask id="P4_Politica" name="Validar evidencias, costos y competencias">
+      <bpmn:incoming>P4_F10</bpmn:incoming>
+      <bpmn:outgoing>P4_F11</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:userTask id="P4_Humano" name="Aprobar, corregir o rechazar la propuesta">
+      <bpmn:incoming>P4_F11</bpmn:incoming>
+      <bpmn:outgoing>P4_F12</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="P4_Aprobada" name="¿Existe propuesta autorizada?" default="P4_F14">
+      <bpmn:incoming>P4_F12</bpmn:incoming>
+      <bpmn:outgoing>P4_F13</bpmn:outgoing>
+      <bpmn:outgoing>P4_F14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="P4_Pendiente" name="Guardar pendiente y asignar responsable">
+      <bpmn:incoming>P4_F06</bpmn:incoming>
+      <bpmn:incoming>P4_F09</bpmn:incoming>
+      <bpmn:incoming>P4_F14</bpmn:incoming>
+      <bpmn:incoming>P4_F17</bpmn:incoming>
+      <bpmn:incoming>P4_F20</bpmn:incoming>
+      <bpmn:incoming>P4_F22</bpmn:incoming>
+      <bpmn:incoming>P4_F25</bpmn:incoming>
+      <bpmn:outgoing>P4_F26</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="P4_FinPend" name="Reclamo abierto con siguiente acción">
+      <bpmn:incoming>P4_F26</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="P4_Proponer" name="Comunicar solución autorizada al cliente">
+      <bpmn:incoming>P4_F13</bpmn:incoming>
+      <bpmn:outgoing>P4_F15</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:receiveTask id="P4_Elegir" name="Esperar aceptación o contrapropuesta">
+      <bpmn:incoming>P4_F15</bpmn:incoming>
+      <bpmn:outgoing>P4_F16</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:boundaryEvent id="P4_Timeout2" name="24 h sin aceptación" attachedToRef="P4_Elegir" cancelActivity="true">
+      <bpmn:outgoing>P4_F17</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Def_P4_Timeout2">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:exclusiveGateway id="P4_Acepta" name="¿Cliente acepta?" default="P4_F20">
+      <bpmn:incoming>P4_F16</bpmn:incoming>
+      <bpmn:outgoing>P4_F18</bpmn:outgoing>
+      <bpmn:outgoing>P4_F19</bpmn:outgoing>
+      <bpmn:outgoing>P4_F20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="P4_Ejecutar" name="Registrar plan autorizado sin pago automático">
+      <bpmn:incoming>P4_F18</bpmn:incoming>
+      <bpmn:outgoing>P4_F21</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="P4_Error" name="Fallo de ejecución" attachedToRef="P4_Ejecutar" cancelActivity="true">
+      <bpmn:outgoing>P4_F22</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="Def_P4_Error" errorRef="Err_P4_Error"/>
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="P4_Cumplimiento" name="Verificar cumplimiento y documentar conformidad">
+      <bpmn:incoming>P4_F21</bpmn:incoming>
+      <bpmn:outgoing>P4_F23</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="P4_Cumple" name="¿Cumplimiento acreditado?" default="P4_F25">
+      <bpmn:incoming>P4_F23</bpmn:incoming>
+      <bpmn:outgoing>P4_F24</bpmn:outgoing>
+      <bpmn:outgoing>P4_F25</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="P4_Cerrar" name="Cerrar solo con evidencia del cumplimiento">
+      <bpmn:incoming>P4_F24</bpmn:incoming>
+      <bpmn:outgoing>P4_F27</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="P4_Fin" name="Reclamo resuelto y trazable">
+      <bpmn:incoming>P4_F27</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="P4_F01" sourceRef="P4_S" targetRef="P4_Expediente"/>
+    <bpmn:sequenceFlow id="P4_F02" sourceRef="P4_Expediente" targetRef="P4_Analizar"/>
+    <bpmn:sequenceFlow id="P4_F03" sourceRef="P4_Analizar" targetRef="P4_Suficiente"/>
+    <bpmn:sequenceFlow id="P4_F04" name="Sí" sourceRef="P4_Suficiente" targetRef="P4_Alternativas">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">evidencia_suficiente</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P4_F05" name="Aclarable (1 ronda)" sourceRef="P4_Suficiente" targetRef="P4_Solicitar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">faltantes_identificados and solicitudes &lt; 1</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P4_F06" name="Sin sustento / límite" sourceRef="P4_Suficiente" targetRef="P4_Pendiente"/>
+    <bpmn:sequenceFlow id="P4_F07" sourceRef="P4_Solicitar" targetRef="P4_Respuesta"/>
+    <bpmn:sequenceFlow id="P4_F08" name="Evidencia recibida" sourceRef="P4_Respuesta" targetRef="P4_Expediente"/>
+    <bpmn:sequenceFlow id="P4_F09" name="Sin respuesta" sourceRef="P4_Timeout" targetRef="P4_Pendiente"/>
+    <bpmn:sequenceFlow id="P4_F10" sourceRef="P4_Alternativas" targetRef="P4_Politica"/>
+    <bpmn:sequenceFlow id="P4_F11" sourceRef="P4_Politica" targetRef="P4_Humano"/>
+    <bpmn:sequenceFlow id="P4_F12" sourceRef="P4_Humano" targetRef="P4_Aprobada"/>
+    <bpmn:sequenceFlow id="P4_F13" name="Sí" sourceRef="P4_Aprobada" targetRef="P4_Proponer">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">propuesta_autorizada</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P4_F14" name="No" sourceRef="P4_Aprobada" targetRef="P4_Pendiente"/>
+    <bpmn:sequenceFlow id="P4_F15" sourceRef="P4_Proponer" targetRef="P4_Elegir"/>
+    <bpmn:sequenceFlow id="P4_F16" sourceRef="P4_Elegir" targetRef="P4_Acepta"/>
+    <bpmn:sequenceFlow id="P4_F17" name="Sin respuesta" sourceRef="P4_Timeout2" targetRef="P4_Pendiente"/>
+    <bpmn:sequenceFlow id="P4_F18" name="Sí" sourceRef="P4_Acepta" targetRef="P4_Ejecutar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">aceptacion_cliente</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P4_F19" name="Contrapropuesta (1 ronda)" sourceRef="P4_Acepta" targetRef="P4_Alternativas">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">contrapropuesta and negociaciones &lt; 1</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P4_F20" name="No / límite" sourceRef="P4_Acepta" targetRef="P4_Pendiente"/>
+    <bpmn:sequenceFlow id="P4_F21" sourceRef="P4_Ejecutar" targetRef="P4_Cumplimiento"/>
+    <bpmn:sequenceFlow id="P4_F22" name="No cerrar" sourceRef="P4_Error" targetRef="P4_Pendiente"/>
+    <bpmn:sequenceFlow id="P4_F23" sourceRef="P4_Cumplimiento" targetRef="P4_Cumple"/>
+    <bpmn:sequenceFlow id="P4_F24" name="Sí" sourceRef="P4_Cumple" targetRef="P4_Cerrar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">cumplimiento_acreditado</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P4_F25" name="No" sourceRef="P4_Cumple" targetRef="P4_Pendiente"/>
+    <bpmn:sequenceFlow id="P4_F26" sourceRef="P4_Pendiente" targetRef="P4_FinPend"/>
+    <bpmn:sequenceFlow id="P4_F27" sourceRef="P4_Cerrar" targetRef="P4_Fin"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_P4">
+    <bpmndi:BPMNPlane id="Plane_P4" bpmnElement="Collaboration_P4">
+      <bpmndi:BPMNShape id="Shape_Client_P4" bpmnElement="Client_P4" isHorizontal="true">
+        <dc:Bounds x="50" y="30" width="3835" height="90"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Pool_P4" bpmnElement="Pool_P4" isHorizontal="true">
+        <dc:Bounds x="50" y="170" width="3835" height="1080"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Lane0" bpmnElement="P4_Lane0" isHorizontal="true">
+        <dc:Bounds x="80" y="170" width="3805" height="360"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Lane1" bpmnElement="P4_Lane1" isHorizontal="true">
+        <dc:Bounds x="80" y="530" width="3805" height="360"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Lane2" bpmnElement="P4_Lane2" isHorizontal="true">
+        <dc:Bounds x="80" y="890" width="3805" height="360"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_S" bpmnElement="P4_S">
+        <dc:Bounds x="179.0" y="634.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="124" y="686.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Expediente" bpmnElement="P4_Expediente">
+        <dc:Bounds x="352.0" y="612.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Analizar" bpmnElement="P4_Analizar">
+        <dc:Bounds x="587.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Suficiente" bpmnElement="P4_Suficiente">
+        <dc:Bounds x="878.0" y="268.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="829" y="332.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Solicitar" bpmnElement="P4_Solicitar">
+        <dc:Bounds x="1057.0" y="397.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Respuesta" bpmnElement="P4_Respuesta">
+        <dc:Bounds x="1292.0" y="397.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Timeout" bpmnElement="P4_Timeout">
+        <dc:Bounds x="1409.0" y="462.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1354.0" y="514.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Alternativas" bpmnElement="P4_Alternativas">
+        <dc:Bounds x="1057.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Politica" bpmnElement="P4_Politica">
+        <dc:Bounds x="1292.0" y="612.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Humano" bpmnElement="P4_Humano">
+        <dc:Bounds x="1527.0" y="972.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Aprobada" bpmnElement="P4_Aprobada">
+        <dc:Bounds x="1818.0" y="988.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1769" y="1052.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Pendiente" bpmnElement="P4_Pendiente">
+        <dc:Bounds x="1997.0" y="757.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_FinPend" bpmnElement="P4_FinPend">
+        <dc:Bounds x="2294.0" y="779.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2239" y="831.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Proponer" bpmnElement="P4_Proponer">
+        <dc:Bounds x="1997.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Elegir" bpmnElement="P4_Elegir">
+        <dc:Bounds x="2232.0" y="252.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Timeout2" bpmnElement="P4_Timeout2">
+        <dc:Bounds x="2349.0" y="317.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2294.0" y="369.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Acepta" bpmnElement="P4_Acepta">
+        <dc:Bounds x="2523.0" y="268.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2474" y="332.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Ejecutar" bpmnElement="P4_Ejecutar">
+        <dc:Bounds x="2702.0" y="612.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Error" bpmnElement="P4_Error">
+        <dc:Bounds x="2819.0" y="677.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2764.0" y="729.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Cumplimiento" bpmnElement="P4_Cumplimiento">
+        <dc:Bounds x="2937.0" y="972.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Cumple" bpmnElement="P4_Cumple">
+        <dc:Bounds x="3228.0" y="988.0" width="54" height="54"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3179" y="1052.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Cerrar" bpmnElement="P4_Cerrar">
+        <dc:Bounds x="3407.0" y="612.0" width="166" height="86"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_P4_Fin" bpmnElement="P4_Fin">
+        <dc:Bounds x="3704.0" y="634.0" width="42" height="42"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3649" y="686.0" width="152" height="55"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Edge_P4_F01" bpmnElement="P4_F01">
+        <di:waypoint x="221.0" y="655.0"/>
+        <di:waypoint x="352.0" y="655.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F02" bpmnElement="P4_F02">
+        <di:waypoint x="518.0" y="655.0"/>
+        <di:waypoint x="548.0" y="655.0"/>
+        <di:waypoint x="548.0" y="295.0"/>
+        <di:waypoint x="587.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F03" bpmnElement="P4_F03">
+        <di:waypoint x="753.0" y="295.0"/>
+        <di:waypoint x="878.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F04" bpmnElement="P4_F04">
+        <di:waypoint x="932.0" y="295.0"/>
+        <di:waypoint x="1057.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="929.5" y="258.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F05" bpmnElement="P4_F05">
+        <di:waypoint x="932.0" y="295.0"/>
+        <di:waypoint x="962.0" y="295.0"/>
+        <di:waypoint x="962.0" y="440.0"/>
+        <di:waypoint x="1057.0" y="440.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="961.0" y="339.5" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F06" bpmnElement="P4_F06">
+        <di:waypoint x="932.0" y="295.0"/>
+        <di:waypoint x="962.0" y="295.0"/>
+        <di:waypoint x="962.0" y="594"/>
+        <di:waypoint x="1972.0" y="594"/>
+        <di:waypoint x="1972.0" y="800.0"/>
+        <di:waypoint x="1997.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="964.0" y="566" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F07" bpmnElement="P4_F07">
+        <di:waypoint x="1223.0" y="440.0"/>
+        <di:waypoint x="1292.0" y="440.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F08" bpmnElement="P4_F08">
+        <di:waypoint x="1458.0" y="440.0"/>
+        <di:waypoint x="1480.0" y="440.0"/>
+        <di:waypoint x="1480.0" y="485"/>
+        <di:waypoint x="330.0" y="485"/>
+        <di:waypoint x="330.0" y="655.0"/>
+        <di:waypoint x="352.0" y="655.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="840.0" y="455" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F09" bpmnElement="P4_F09">
+        <di:waypoint x="1451.0" y="483.0"/>
+        <di:waypoint x="1473.0" y="483.0"/>
+        <di:waypoint x="1473.0" y="860"/>
+        <di:waypoint x="1975.0" y="860"/>
+        <di:waypoint x="1975.0" y="800.0"/>
+        <di:waypoint x="1997.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1659.0" y="830" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F10" bpmnElement="P4_F10">
+        <di:waypoint x="1223.0" y="295.0"/>
+        <di:waypoint x="1253.0" y="295.0"/>
+        <di:waypoint x="1253.0" y="655.0"/>
+        <di:waypoint x="1292.0" y="655.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F11" bpmnElement="P4_F11">
+        <di:waypoint x="1458.0" y="655.0"/>
+        <di:waypoint x="1488.0" y="655.0"/>
+        <di:waypoint x="1488.0" y="1015.0"/>
+        <di:waypoint x="1527.0" y="1015.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F12" bpmnElement="P4_F12">
+        <di:waypoint x="1693.0" y="1015.0"/>
+        <di:waypoint x="1818.0" y="1015.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F13" bpmnElement="P4_F13">
+        <di:waypoint x="1872.0" y="1015.0"/>
+        <di:waypoint x="1902.0" y="1015.0"/>
+        <di:waypoint x="1902.0" y="295.0"/>
+        <di:waypoint x="1997.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1901.0" y="627.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F14" bpmnElement="P4_F14">
+        <di:waypoint x="1872.0" y="1015.0"/>
+        <di:waypoint x="1902.0" y="1015.0"/>
+        <di:waypoint x="1902.0" y="800.0"/>
+        <di:waypoint x="1997.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1901.0" y="879.5" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F15" bpmnElement="P4_F15">
+        <di:waypoint x="2163.0" y="295.0"/>
+        <di:waypoint x="2232.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F16" bpmnElement="P4_F16">
+        <di:waypoint x="2398.0" y="295.0"/>
+        <di:waypoint x="2523.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F17" bpmnElement="P4_F17">
+        <di:waypoint x="2391.0" y="338.0"/>
+        <di:waypoint x="2413.0" y="338.0"/>
+        <di:waypoint x="2413.0" y="875"/>
+        <di:waypoint x="1975.0" y="875"/>
+        <di:waypoint x="1975.0" y="800.0"/>
+        <di:waypoint x="1997.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2129.0" y="845" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F18" bpmnElement="P4_F18">
+        <di:waypoint x="2577.0" y="295.0"/>
+        <di:waypoint x="2607.0" y="295.0"/>
+        <di:waypoint x="2607.0" y="655.0"/>
+        <di:waypoint x="2702.0" y="655.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2606.0" y="447.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F19" bpmnElement="P4_F19">
+        <di:waypoint x="2577.0" y="295.0"/>
+        <di:waypoint x="2599.0" y="295.0"/>
+        <di:waypoint x="2599.0" y="510"/>
+        <di:waypoint x="1035.0" y="510"/>
+        <di:waypoint x="1035.0" y="295.0"/>
+        <di:waypoint x="1057.0" y="295.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1752.0" y="480" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F20" bpmnElement="P4_F20">
+        <di:waypoint x="2577.0" y="295.0"/>
+        <di:waypoint x="2599.0" y="295.0"/>
+        <di:waypoint x="2599.0" y="490"/>
+        <di:waypoint x="1975.0" y="490"/>
+        <di:waypoint x="1975.0" y="800.0"/>
+        <di:waypoint x="1997.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2222.0" y="462" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F21" bpmnElement="P4_F21">
+        <di:waypoint x="2868.0" y="655.0"/>
+        <di:waypoint x="2898.0" y="655.0"/>
+        <di:waypoint x="2898.0" y="1015.0"/>
+        <di:waypoint x="2937.0" y="1015.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F22" bpmnElement="P4_F22">
+        <di:waypoint x="2861.0" y="698.0"/>
+        <di:waypoint x="2883.0" y="698.0"/>
+        <di:waypoint x="2883.0" y="890"/>
+        <di:waypoint x="1975.0" y="890"/>
+        <di:waypoint x="1975.0" y="800.0"/>
+        <di:waypoint x="1997.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2364.0" y="860" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F23" bpmnElement="P4_F23">
+        <di:waypoint x="3103.0" y="1015.0"/>
+        <di:waypoint x="3228.0" y="1015.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F24" bpmnElement="P4_F24">
+        <di:waypoint x="3282.0" y="1015.0"/>
+        <di:waypoint x="3312.0" y="1015.0"/>
+        <di:waypoint x="3312.0" y="655.0"/>
+        <di:waypoint x="3407.0" y="655.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3311.0" y="807.0" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F25" bpmnElement="P4_F25">
+        <di:waypoint x="3282.0" y="1015.0"/>
+        <di:waypoint x="3304.0" y="1015.0"/>
+        <di:waypoint x="3304.0" y="1200"/>
+        <di:waypoint x="1975.0" y="1200"/>
+        <di:waypoint x="1975.0" y="800.0"/>
+        <di:waypoint x="1997.0" y="800.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2574.5" y="1170" width="130" height="32"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F26" bpmnElement="P4_F26">
+        <di:waypoint x="2163.0" y="800.0"/>
+        <di:waypoint x="2294.0" y="800.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_F27" bpmnElement="P4_F27">
+        <di:waypoint x="3573.0" y="655.0"/>
+        <di:waypoint x="3704.0" y="655.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_M1" bpmnElement="P4_M1">
+        <di:waypoint x="1223.0" y="440.0"/>
+        <di:waypoint x="1241.0" y="440.0"/>
+        <di:waypoint x="1241.0" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_M2" bpmnElement="P4_M2">
+        <di:waypoint x="1488.0" y="120"/>
+        <di:waypoint x="1488.0" y="440.0"/>
+        <di:waypoint x="1458.0" y="440.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_M3" bpmnElement="P4_M3">
+        <di:waypoint x="2163.0" y="295.0"/>
+        <di:waypoint x="2181.0" y="295.0"/>
+        <di:waypoint x="2181.0" y="120"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_P4_M4" bpmnElement="P4_M4">
+        <di:waypoint x="2428.0" y="120"/>
+        <di:waypoint x="2428.0" y="295.0"/>
+        <di:waypoint x="2398.0" y="295.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

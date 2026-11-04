@@ -1,3 +1,5 @@
+> Antecedente V1 corporativo, superado para el alcance seleccionado. Versión vigente: [descripciones V2](../DESCRIPCIONES_PROCESOS.md). Original conservado en [antecedentes](../antecedentes/v1/descripciones/05-reclamos-incidencias.md).
+
 # P4. Investigar y resolver reclamos e incidencias
 
 **Diagrama:** `bpmn/05-to-be-reclamos-incidencias.bpmn`. **Proceso:** `Process_P4`. **Especialista:** agente de incidencias. **Responsable humano:** asesor y administración. **Inicio del piloto:** supervisado, después de habilitar el registro de expedientes.

@@ -1,0 +1,11 @@
+{
+  "version": "synthetic-retail-2.0",
+  "currency": "PEN",
+  "synthetic": true,
+  "promise_hours": 48,
+  "services": {
+    "wash_kg": {"label": "Lavado por kilo", "unit": "kg", "price": "8.50"},
+    "wash_piece": {"label": "Lavado por prenda", "unit": "piece", "price": "6.00"},
+    "iron_piece": {"label": "Planchado por prenda", "unit": "piece", "price": "4.50"}
+  }
+}

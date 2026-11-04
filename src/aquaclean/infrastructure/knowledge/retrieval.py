@@ -1,6 +1,8 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
+from langsmith import traceable
+
 from aquaclean.application.ports import EmbeddingProvider
 from aquaclean.domain.entities import ORG, Actor, Clock, digest
 from aquaclean.domain.errors import DomainError
@@ -38,7 +40,7 @@ class KnowledgeRepository:
                     (self.collection, self.embeddings.model, self.embeddings.dimension),
                 )
                 await conn.execute(
-                    "INSERT INTO app.documents(id,organization_id,roles,title,version,hash,approved,valid_from) VALUES(%s,%s,%s,%s,'demo-1',%s,true,%s) ON CONFLICT(id) DO UPDATE SET hash=excluded.hash,title=excluded.title",
+                    "INSERT INTO app.documents(id,organization_id,roles,title,version,hash,approved,valid_from) VALUES(%s,%s,%s,%s,'retail-demo-2',%s,true,%s) ON CONFLICT(id) DO UPDATE SET hash=excluded.hash,title=excluded.title,version=excluded.version",
                     (
                         doc_id,
                         ORG,
@@ -75,6 +77,14 @@ class KnowledgeRepository:
             "written": vectors_written,
         }
 
+    @traceable(
+        name="AquaClean.filtered_retrieval",
+        run_type="retriever",
+        process_inputs=lambda x: {
+            "query": x.get("query"),
+            "client_scope": bool(x.get("client_id")),
+        },
+    )
     async def search(self, actor: Actor, query: str, client_id: str | None = None) -> list[dict]:
         actor.scope(actor.organization_id, client_id or actor.client_id)
         collection = await self.db.one(

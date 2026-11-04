@@ -14,12 +14,23 @@ class Settings(BaseSettings):
     database_url: SecretStr = SecretStr(
         "postgresql://aquaclean:aquaclean_local_only@db:5432/aquaclean"
     )
+    langsmith_tracing: bool = False
+    langsmith_api_key: SecretStr = SecretStr("")
+    langsmith_project: str = ""
+    langsmith_agent_id: str = ""
+    langsmith_agent_environment: str = "local"
+    langsmith_endpoint: str = "https://api.smith.langchain.com"
+    langsmith_workspace_id: str = ""
     gemini_api_key: SecretStr = SecretStr("")
     gemini_chat_model: str = "gemini-3.5-flash-lite"
     gemini_embedding_model: str = "gemini-embedding-001"
     embedding_dimension: int = 768
     llm_timeout_seconds: int = 60
-    max_model_calls: int = 10
+    max_model_calls: int = 24
+    deep_max_model_calls: int = 16
+    deep_timeout_seconds: int = 180
+    processing_alert_hours: int = 24
+    retail_tariff_path: Path = Path("config/retail-tariffs-v2.json")
     max_context_chars: int = 60000
     max_pending_runs: int = 20
     runtime_database_password: SecretStr = SecretStr("aquaclean_local_only")

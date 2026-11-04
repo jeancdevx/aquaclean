@@ -1,5 +1,7 @@
-# Agenda — conocimiento DEMO SINTÉTICO
+# P2 · Logística al detalle · Laboratorio sintético V2
 
-Regla de laboratorio, no ratificada como compromiso real: turnos manana y tarde, con capacidad configurable por slot. Solo se ofrecen alternativas calculadas sobre la agenda persistida.
+Para recojo coordinar una PickupRequest REQUESTED o SCHEDULED, por pickup_request_id; no exigir orden. Para entrega coordinar ServiceOrder READY o DELIVERY_PENDING por service_order_id, con liberación humana de calidad. El estado logístico no reemplaza los hitos del servicio. Una solicitud previa de recojo no abre orden.
 
-P2 requiere pedido activo, elección explícita y revalidación de capacidad/versiones en la transacción. Un cambio más allá de dos días de la fecha de recojo de referencia requiere revisión de logística. La autorización no crea capacidad física. Cancelar libera la reserva.
+Las alternativas vienen exclusivamente de slots futuros, capacidad y versión persistidas. La selección humana es explícita. Revalidar cupo, ventana, alcance y versión bajo transacción. Una aprobación no crea capacidad. Reprogramar libera el cupo anterior. Si no hay alternativas, dejar pendiente sin prometer ni inventar.
+
+Una reserva no acredita transporte. El operador declara recojo o entrega efectiva con evidencia. Entrega registra receptor y conformidad explícita. Avisos solo en bandeja local mediante outbox; no existe envío real por correo o WhatsApp.

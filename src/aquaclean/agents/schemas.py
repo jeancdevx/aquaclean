@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from aquaclean.domain.retail import PickupInput, ReceptionInput
+
 
 class AgentContract(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -39,8 +41,10 @@ class BaseProposal(AgentContract):
 
 
 class RequestDraft(BaseProposal):
-    action: Literal["clarify", "register", "cancel", "answer"]
-    fields: RequestFields
+    action: Literal["clarify", "register", "receive", "request_pickup", "cancel", "answer"]
+    fields: RequestFields = Field(default_factory=RequestFields)
+    reception: ReceptionInput | None = None
+    pickup: PickupInput | None = None
     field_sources: dict[str, str] = Field(default_factory=dict)
 
 

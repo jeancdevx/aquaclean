@@ -1,3 +1,5 @@
+> Antecedente V1 corporativo, superado para el alcance seleccionado. Versión vigente: [descripciones V2](../DESCRIPCIONES_PROCESOS.md). Original conservado en [antecedentes](../antecedentes/v1/descripciones/04-calidad.md).
+
 # P3. Analizar observaciones de calidad y recomendar tratamiento
 
 **Diagrama:** `bpmn/04-to-be-calidad.bpmn`. **Proceso:** `Process_P3`. **Especialista:** agente de calidad. **Responsable humano:** personal de planta y control de calidad.

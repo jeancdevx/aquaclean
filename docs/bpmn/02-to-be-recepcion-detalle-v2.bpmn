@@ -1,0 +1,362 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ac="https://aquaclean.example/bpmn/v2" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Def_P1" targetNamespace="https://aquaclean.example/bpmn/v2" exporter="Aqua Clean especificación alineada V2" exporterVersion="2.0">
+  <bpmn:collaboration id="Coll_P1">
+    <bpmn:participant id="Pool_P1" name="Aqua Clean · P1 · Asistir recepción y abrir orden de servicio" processRef="Process_P1"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_P1" name="P1 · Asistir recepción y abrir orden de servicio" isExecutable="false">
+    <bpmn:documentation>TO BE propuesto V2 para lavandería al detalle. No acredita código ejecutado. Personas verifican prendas; IA propone; servicios validan y escriben. Descripciones y condiciones en PLAN_ALINEADO_V2.md y DESCRIPCIONES_TO_BE_V2.md. Parámetros de laboratorio no equivalen a políticas ratificadas.</bpmn:documentation>
+    <bpmn:laneSet id="Lanes_P1">
+      <bpmn:lane id="P1_Lane0" name="Operador y cliente · verificación humana">
+        <bpmn:flowNodeRef>R_S</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Verificar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Preguntar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Confirmar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Acepta</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Adelanto</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Pend</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_FinPend</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P1_Lane1" name="Agentes y subprocesos de apoyo">
+        <bpmn:flowNodeRef>R_Interpretar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Resumen</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="P1_Lane2" name="Servicios deterministas y persistencia">
+        <bpmn:flowNodeRef>R_Evidencia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Suficiente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Calcular</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Validar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Registrar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Cobro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Constancia</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>R_Fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="R_S" name="Prendas recibidas realmente">
+      <bpmn:outgoing>P1_F00</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="R_Verificar" name="Identificar cliente y registrar prendas servicios y hallazgos">
+      <bpmn:incoming>P1_F00</bpmn:incoming>
+      <bpmn:outgoing>P1_F01</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="R_Evidencia" name="Cargar evidencia y datos de recepción">
+      <bpmn:incoming>P1_F01</bpmn:incoming>
+      <bpmn:incoming>P1_F07</bpmn:incoming>
+      <bpmn:outgoing>P1_F02</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="R_Interpretar" name="Atención estructura datos y detecta faltantes">
+      <bpmn:incoming>P1_F02</bpmn:incoming>
+      <bpmn:outgoing>P1_F03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="R_Suficiente" name="¿Datos completos y sustentados?" default="P1_F06">
+      <bpmn:incoming>P1_F03</bpmn:incoming>
+      <bpmn:outgoing>P1_F04</bpmn:outgoing>
+      <bpmn:outgoing>P1_F05</bpmn:outgoing>
+      <bpmn:outgoing>P1_F06</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="R_Preguntar" name="Aclarar datos o corregir recepción">
+      <bpmn:incoming>P1_F05</bpmn:incoming>
+      <bpmn:incoming>P1_F12</bpmn:incoming>
+      <bpmn:outgoing>P1_F07</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:businessRuleTask id="R_Calcular" name="Calcular tarifa importes saldo y fecha prometida">
+      <bpmn:incoming>P1_F04</bpmn:incoming>
+      <bpmn:outgoing>P1_F08</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:serviceTask id="R_Resumen" name="Explicar resumen y fuentes de cada dato">
+      <bpmn:incoming>P1_F08</bpmn:incoming>
+      <bpmn:outgoing>P1_F09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="R_Confirmar" name="Revisar y confirmar recepción y cotización">
+      <bpmn:incoming>P1_F09</bpmn:incoming>
+      <bpmn:outgoing>P1_F10</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="R_Acepta" name="¿Confirma la versión vigente?" default="P1_F13">
+      <bpmn:incoming>P1_F10</bpmn:incoming>
+      <bpmn:outgoing>P1_F11</bpmn:outgoing>
+      <bpmn:outgoing>P1_F12</bpmn:outgoing>
+      <bpmn:outgoing>P1_F13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:businessRuleTask id="R_Validar" name="Revalidar permisos datos evidencia y versión">
+      <bpmn:incoming>P1_F11</bpmn:incoming>
+      <bpmn:outgoing>P1_F14</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:serviceTask id="R_Registrar" name="Crear cliente si es nuevo y orden con líneas atómicamente">
+      <bpmn:incoming>P1_F14</bpmn:incoming>
+      <bpmn:outgoing>P1_F15</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="R_Adelanto" name="Declarar adelanto recibido o ausencia de adelanto">
+      <bpmn:incoming>P1_F15</bpmn:incoming>
+      <bpmn:outgoing>P1_F16</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="R_Cobro" name="Registrar cobro idempotente y recalcular saldo">
+      <bpmn:incoming>P1_F16</bpmn:incoming>
+      <bpmn:outgoing>P1_F17</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="R_Constancia" name="Emitir constancia de recepción de demostración">
+      <bpmn:incoming>P1_F17</bpmn:incoming>
+      <bpmn:outgoing>P1_F18</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="R_Fin" name="Orden RECEIVED y saldo persistidos">
+      <bpmn:incoming>P1_F18</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="R_Pend" name="Guardar recepción pendiente con motivo">
+      <bpmn:incoming>P1_F06</bpmn:incoming>
+      <bpmn:incoming>P1_F13</bpmn:incoming>
+      <bpmn:outgoing>P1_F19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="R_FinPend" name="No afirmar orden creada">
+      <bpmn:incoming>P1_F19</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="P1_F00" sourceRef="R_S" targetRef="R_Verificar"/>
+    <bpmn:sequenceFlow id="P1_F01" sourceRef="R_Verificar" targetRef="R_Evidencia"/>
+    <bpmn:sequenceFlow id="P1_F02" sourceRef="R_Evidencia" targetRef="R_Interpretar"/>
+    <bpmn:sequenceFlow id="P1_F03" sourceRef="R_Interpretar" targetRef="R_Suficiente"/>
+    <bpmn:sequenceFlow id="P1_F04" sourceRef="R_Suficiente" targetRef="R_Calcular" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">datos_completos</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F05" sourceRef="R_Suficiente" targetRef="R_Preguntar" name="Aclarable">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">faltantes and rondas &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F06" sourceRef="R_Suficiente" targetRef="R_Pend" name="No resoluble"/>
+    <bpmn:sequenceFlow id="P1_F07" sourceRef="R_Preguntar" targetRef="R_Evidencia"/>
+    <bpmn:sequenceFlow id="P1_F08" sourceRef="R_Calcular" targetRef="R_Resumen"/>
+    <bpmn:sequenceFlow id="P1_F09" sourceRef="R_Resumen" targetRef="R_Confirmar"/>
+    <bpmn:sequenceFlow id="P1_F10" sourceRef="R_Confirmar" targetRef="R_Acepta"/>
+    <bpmn:sequenceFlow id="P1_F11" sourceRef="R_Acepta" targetRef="R_Validar" name="Sí">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">confirmacion_vigente</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F12" sourceRef="R_Acepta" targetRef="R_Preguntar" name="Corregir">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">correccion and rondas &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="P1_F13" sourceRef="R_Acepta" targetRef="R_Pend" name="Rechazo o límite"/>
+    <bpmn:sequenceFlow id="P1_F14" sourceRef="R_Validar" targetRef="R_Registrar"/>
+    <bpmn:sequenceFlow id="P1_F15" sourceRef="R_Registrar" targetRef="R_Adelanto"/>
+    <bpmn:sequenceFlow id="P1_F16" sourceRef="R_Adelanto" targetRef="R_Cobro"/>
+    <bpmn:sequenceFlow id="P1_F17" sourceRef="R_Cobro" targetRef="R_Constancia"/>
+    <bpmn:sequenceFlow id="P1_F18" sourceRef="R_Constancia" targetRef="R_Fin"/>
+    <bpmn:sequenceFlow id="P1_F19" sourceRef="R_Pend" targetRef="R_FinPend"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_P1">
+    <bpmndi:BPMNPlane id="Plane_P1" bpmnElement="Coll_P1">
+      <bpmndi:BPMNShape id="Pool_P1_DI" bpmnElement="Pool_P1" isHorizontal="true">
+        <dc:Bounds x="40" y="100" width="3630" height="1090"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P1_Lane0_DI" bpmnElement="P1_Lane0" isHorizontal="true">
+        <dc:Bounds x="70" y="100" width="3600" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P1_Lane1_DI" bpmnElement="P1_Lane1" isHorizontal="true">
+        <dc:Bounds x="70" y="350" width="3600" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P1_Lane2_DI" bpmnElement="P1_Lane2" isHorizontal="true">
+        <dc:Bounds x="70" y="600" width="3600" height="590"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_S_DI" bpmnElement="R_S" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="130" y="204.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="95" y="248.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Verificar_DI" bpmnElement="R_Verificar" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="320" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Evidencia_DI" bpmnElement="R_Evidencia" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="510" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Interpretar_DI" bpmnElement="R_Interpretar" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="700" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Suficiente_DI" bpmnElement="R_Suficiente" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="890" y="697.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="855" y="755.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Preguntar_DI" bpmnElement="R_Preguntar" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="1080" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Calcular_DI" bpmnElement="R_Calcular" bioc:fill="#E0F2FE" bioc:stroke="#334155">
+        <dc:Bounds x="1270" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Resumen_DI" bpmnElement="R_Resumen" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="1460" y="430.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Confirmar_DI" bpmnElement="R_Confirmar" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="1650" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Acepta_DI" bpmnElement="R_Acepta" isMarkerVisible="true" bioc:fill="#FEF9C3" bioc:stroke="#334155">
+        <dc:Bounds x="1840" y="197.0" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1805" y="255.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Validar_DI" bpmnElement="R_Validar" bioc:fill="#E0F2FE" bioc:stroke="#334155">
+        <dc:Bounds x="2030" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Registrar_DI" bpmnElement="R_Registrar" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="2220" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Adelanto_DI" bpmnElement="R_Adelanto" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="2410" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Cobro_DI" bpmnElement="R_Cobro" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="2600" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Constancia_DI" bpmnElement="R_Constancia" bioc:fill="#CCFBF1" bioc:stroke="#334155">
+        <dc:Bounds x="2790" y="680.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Fin_DI" bpmnElement="R_Fin" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="2980" y="704.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2945" y="748.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_Pend_DI" bpmnElement="R_Pend" bioc:fill="#FEF3C7" bioc:stroke="#334155">
+        <dc:Bounds x="3170" y="180.0" width="150" height="84"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_FinPend_DI" bpmnElement="R_FinPend" bioc:fill="#FFFFFF" bioc:stroke="#334155">
+        <dc:Bounds x="3360" y="204.0" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3325" y="248.0" width="110" height="46"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="P1_F00_DI" bpmnElement="P1_F00">
+        <di:waypoint x="166" y="222.0"/>
+        <di:waypoint x="243.0" y="222.0"/>
+        <di:waypoint x="243.0" y="222.0"/>
+        <di:waypoint x="320" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F01_DI" bpmnElement="P1_F01">
+        <di:waypoint x="470" y="222.0"/>
+        <di:waypoint x="490.0" y="222.0"/>
+        <di:waypoint x="490.0" y="722.0"/>
+        <di:waypoint x="510" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F02_DI" bpmnElement="P1_F02">
+        <di:waypoint x="660" y="722.0"/>
+        <di:waypoint x="680.0" y="722.0"/>
+        <di:waypoint x="680.0" y="472.0"/>
+        <di:waypoint x="700" y="472.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F03_DI" bpmnElement="P1_F03">
+        <di:waypoint x="850" y="472.0"/>
+        <di:waypoint x="870.0" y="472.0"/>
+        <di:waypoint x="870.0" y="722.0"/>
+        <di:waypoint x="890" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F04_DI" bpmnElement="P1_F04">
+        <di:waypoint x="915.0" y="747.0"/>
+        <di:waypoint x="915.0" y="908"/>
+        <di:waypoint x="1345.0" y="908"/>
+        <di:waypoint x="1345.0" y="764.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="918.0" y="911" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F05_DI" bpmnElement="P1_F05">
+        <di:waypoint x="940" y="722.0"/>
+        <di:waypoint x="1010.0" y="722.0"/>
+        <di:waypoint x="1010.0" y="222.0"/>
+        <di:waypoint x="1080" y="222.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1013.0" y="725.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F06_DI" bpmnElement="P1_F06">
+        <di:waypoint x="915.0" y="747.0"/>
+        <di:waypoint x="915.0" y="922"/>
+        <di:waypoint x="3245.0" y="922"/>
+        <di:waypoint x="3245.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="918.0" y="925" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F07_DI" bpmnElement="P1_F07">
+        <di:waypoint x="1155.0" y="264.0"/>
+        <di:waypoint x="1155.0" y="929"/>
+        <di:waypoint x="585.0" y="929"/>
+        <di:waypoint x="585.0" y="764.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F08_DI" bpmnElement="P1_F08">
+        <di:waypoint x="1420" y="722.0"/>
+        <di:waypoint x="1440.0" y="722.0"/>
+        <di:waypoint x="1440.0" y="472.0"/>
+        <di:waypoint x="1460" y="472.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F09_DI" bpmnElement="P1_F09">
+        <di:waypoint x="1610" y="472.0"/>
+        <di:waypoint x="1630.0" y="472.0"/>
+        <di:waypoint x="1630.0" y="222.0"/>
+        <di:waypoint x="1650" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F10_DI" bpmnElement="P1_F10">
+        <di:waypoint x="1800" y="222.0"/>
+        <di:waypoint x="1820.0" y="222.0"/>
+        <di:waypoint x="1820.0" y="222.0"/>
+        <di:waypoint x="1840" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F11_DI" bpmnElement="P1_F11">
+        <di:waypoint x="1890" y="222.0"/>
+        <di:waypoint x="1960.0" y="222.0"/>
+        <di:waypoint x="1960.0" y="722.0"/>
+        <di:waypoint x="2030" y="722.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1963.0" y="225.0" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F12_DI" bpmnElement="P1_F12">
+        <di:waypoint x="1865.0" y="247.0"/>
+        <di:waypoint x="1865.0" y="964"/>
+        <di:waypoint x="1155.0" y="964"/>
+        <di:waypoint x="1155.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1868.0" y="967" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F13_DI" bpmnElement="P1_F13">
+        <di:waypoint x="1865.0" y="247.0"/>
+        <di:waypoint x="1865.0" y="971"/>
+        <di:waypoint x="3245.0" y="971"/>
+        <di:waypoint x="3245.0" y="264.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1868.0" y="974" width="130" height="30"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F14_DI" bpmnElement="P1_F14">
+        <di:waypoint x="2180" y="722.0"/>
+        <di:waypoint x="2200.0" y="722.0"/>
+        <di:waypoint x="2200.0" y="722.0"/>
+        <di:waypoint x="2220" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F15_DI" bpmnElement="P1_F15">
+        <di:waypoint x="2370" y="722.0"/>
+        <di:waypoint x="2390.0" y="722.0"/>
+        <di:waypoint x="2390.0" y="222.0"/>
+        <di:waypoint x="2410" y="222.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F16_DI" bpmnElement="P1_F16">
+        <di:waypoint x="2560" y="222.0"/>
+        <di:waypoint x="2580.0" y="222.0"/>
+        <di:waypoint x="2580.0" y="722.0"/>
+        <di:waypoint x="2600" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F17_DI" bpmnElement="P1_F17">
+        <di:waypoint x="2750" y="722.0"/>
+        <di:waypoint x="2770.0" y="722.0"/>
+        <di:waypoint x="2770.0" y="722.0"/>
+        <di:waypoint x="2790" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F18_DI" bpmnElement="P1_F18">
+        <di:waypoint x="2940" y="722.0"/>
+        <di:waypoint x="2960.0" y="722.0"/>
+        <di:waypoint x="2960.0" y="722.0"/>
+        <di:waypoint x="2980" y="722.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="P1_F19_DI" bpmnElement="P1_F19">
+        <di:waypoint x="3320" y="222.0"/>
+        <di:waypoint x="3340.0" y="222.0"/>
+        <di:waypoint x="3340.0" y="222.0"/>
+        <di:waypoint x="3360" y="222.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

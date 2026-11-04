@@ -1,3 +1,5 @@
+> Antecedente V1. Para el alcance vigente al detalle consultar README.md, docs/PLAN_ARQUITECTURA.md, docs/contratos/DETALLE_V2.md y docs/arquitectura/IMPLEMENTADA.md. Se conserva el texto histórico.
+
 # Trazabilidad del negocio al software
 
 | Decisión/actividad | AS IS de origen | TO BE | Responsable / módulo futuro | Aceptación planificada |

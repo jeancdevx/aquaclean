@@ -1,3 +1,5 @@
+> Antecedente V1 corporativo, superado para el alcance seleccionado. Versión vigente: [descripciones V2](../DESCRIPCIONES_PROCESOS.md). Original conservado en [antecedentes](../antecedentes/v1/descripciones/01-to-be-integral.md).
+
 # TO BE integral: atender el pedido corporativo
 
 **Diagrama:** `bpmn/01-to-be-integral.bpmn`. **Proceso:** `Process_Integral`. **Tipo:** coordinación de negocio. **Responsable:** atención, planta, logística, calidad y administración.

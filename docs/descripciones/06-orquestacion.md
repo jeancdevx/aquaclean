@@ -1,3 +1,5 @@
+> Antecedente V1 corporativo, superado para el alcance seleccionado. Versión vigente: [descripciones V2](../DESCRIPCIONES_PROCESOS.md). Original conservado en [antecedentes](../antecedentes/v1/descripciones/06-orquestacion.md).
+
 # Orquestación técnica del sistema multiagente
 
 **Diagrama:** `bpmn/06-orquestacion-multiagente.bpmn`. **Proceso:** `Process_Orquestacion`. **Implementación futura:** `graphs/main.py`, subgrafos P1–P4 y casos de uso de aplicación.
