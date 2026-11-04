@@ -87,7 +87,10 @@ class Repository:
 
     async def snapshot(self, actor: Actor, case_id: str) -> dict:
         case = await self.case(actor, case_id)
+        from aquaclean.infrastructure.persistence.retail import RetailRepository
+
         return {
+            "retail": await RetailRepository(self.db, self.clock).snapshot(actor, case),
             "linked_order_history": await self.order_history(actor, str(case["order_id"]))
             if case["order_id"]
             else [],
@@ -254,6 +257,18 @@ class Repository:
                     "UPDATE app.cases SET order_version=%s WHERE id=%s",
                     (observed_order_version, case_id),
                 )
+            if case["pickup_request_id"]:
+                pickup = await (
+                    await conn.execute(
+                        "SELECT version FROM app.pickup_requests WHERE id=%s FOR SHARE",
+                        (case["pickup_request_id"],),
+                    )
+                ).fetchone()
+                case["pickup_version"] = pickup["version"]
+                await conn.execute(
+                    "UPDATE app.cases SET pickup_version=%s WHERE id=%s",
+                    (pickup["version"], case_id),
+                )
             await conn.execute(
                 "UPDATE app.approvals SET status='stale' WHERE case_id=%s AND status='pending'",
                 (case_id,),
@@ -274,7 +289,7 @@ class Repository:
             )
             return await (
                 await conn.execute(
-                    "INSERT INTO app.approvals(id,case_id,organization_id,proposal_hash,case_version,order_version,policy_version,required_role,kind) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *",
+                    "INSERT INTO app.approvals(id,case_id,organization_id,proposal_hash,case_version,order_version,policy_version,required_role,kind,pickup_version) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *",
                     (
                         aid,
                         case_id,
@@ -285,6 +300,7 @@ class Repository:
                         self.policy_version,
                         role,
                         kind,
+                        case["pickup_version"],
                     ),
                 )
             ).fetchone()
@@ -497,6 +513,26 @@ class Repository:
                 ):
                     raise DomainError("Evento reutilizado.", "idempotency_conflict", 409)
                 return prior
+            if case["order_id"] and (
+                kind in {"inspection", "reprocess"}
+                or (kind == "conformity" and case["process"] != "P4")
+            ):
+                target = await (
+                    await conn.execute(
+                        "SELECT kind,status FROM app.orders WHERE id=%s FOR UPDATE",
+                        (case["order_id"],),
+                    )
+                ).fetchone()
+                if target["kind"] == "retail_v2":
+                    actor.require("quality")
+                if target["kind"] == "retail_v2" and target["status"] != (
+                    "REPROCESS_PENDING" if kind == "reprocess" else "QUALITY_PENDING"
+                ):
+                    raise DomainError(
+                        "La evidencia física no corresponde a la fase del servicio.",
+                        "invalid_phase",
+                        409,
+                    )
             if kind == "reprocess":
                 count = await (
                     await conn.execute(
@@ -504,6 +540,13 @@ class Repository:
                         (case_id,),
                     )
                 ).fetchone()
+                if case["order_id"] and target["kind"] == "retail_v2":
+                    count = await (
+                        await conn.execute(
+                            "SELECT count(*) n FROM app.operator_events e JOIN app.cases c ON c.id=e.case_id WHERE c.order_id=%s AND e.kind='reprocess'",
+                            (case["order_id"],),
+                        )
+                    ).fetchone()
                 approved = await (
                     await conn.execute(
                         "SELECT id FROM app.approvals WHERE case_id=%s AND status='approved' AND kind='human' AND proposal_hash=%s",
@@ -550,6 +593,11 @@ class Repository:
                     (event_id, case_id, actor.organization_id, actor.id, kind, note, attachment_id),
                 )
             ).fetchone()
+            if kind == "reprocess" and case["order_id"]:
+                await conn.execute(
+                    "UPDATE app.orders SET status='QUALITY_PENDING' WHERE id=%s AND kind='retail_v2' AND status='REPROCESS_PENDING'",
+                    (case["order_id"],),
+                )
             # New evidence changes a proposal's meaning: approvals become stale.
             if case["order_id"]:
                 order = await (
