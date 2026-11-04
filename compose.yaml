@@ -1,0 +1,64 @@
+name: aquaclean
+x-app: &app
+  build: .
+  image: aquaclean-local:0.1.0
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    DATABASE_URL: postgresql://aquaclean_runtime:${POSTGRES_PASSWORD:-aquaclean_local_only}@db:5432/${POSTGRES_DB:-aquaclean}
+    MEDIA_ROOT: /data/media
+    STATIC_ROOT: /app/web/dist
+  volumes:
+    - media:/data/media
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+  restart: unless-stopped
+services:
+  db:
+    image: pgvector/pgvector:0.8.2-pg17-trixie@sha256:5c97c57367a485a8e99389548db67d441ab1a878f5492c3df04989f34ecf3c75
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aquaclean}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aquaclean_local_only}
+      POSTGRES_DB: ${POSTGRES_DB:-aquaclean}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+  migrate:
+    <<: *app
+    command: [python, -m, aquaclean.cli, migrate]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-aquaclean}:${POSTGRES_PASSWORD:-aquaclean_local_only}@db:5432/${POSTGRES_DB:-aquaclean}
+      MEDIA_ROOT: /data/media
+      RUNTIME_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-aquaclean_local_only}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+  api:
+    <<: *app
+    command: [uvicorn, aquaclean.interfaces.api.app:app, --host, 0.0.0.0, --port, '8000']
+    ports:
+      - '127.0.0.1:8000:8000'
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  worker:
+    <<: *app
+    command: [python, -m, aquaclean.workers.main]
+    healthcheck:
+      test: [CMD, python, -m, aquaclean.cli, worker-health]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres:
+  media:
