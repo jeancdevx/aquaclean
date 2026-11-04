@@ -17,6 +17,9 @@ from aquaclean.graphs.state import CaseState
 
 class GraphRuntime:
     def __init__(self, settings, actor, clock, repo, provider, knowledge, media, executor):
+        from aquaclean.infrastructure.persistence.retail import RetailRepository
+
+        self.retail = RetailRepository(repo.db, clock, settings.retail_tariff_path)
         self.settings, self.actor, self.clock = settings, actor, clock
         self.repo, self.provider, self.knowledge, self.media, self.executor = (
             repo,
@@ -99,13 +102,13 @@ def build_graph(runtime: GraphRuntime, checkpointer):
             },
         )
         proposed_process = decision.process
-        if decision.process == "P2" and not case["order_id"]:
+        if decision.process == "P2" and not (case["order_id"] or case["pickup_request_id"]):
             # A new pickup starts in attention. Missing an order is a conversational
             # prerequisite, not an integration failure; no logistics tools/effects run.
             decision = decision.model_copy(
                 update={
                     "process": "P1",
-                    "needs_clarification": True,
+                    "needs_clarification": False,
                     "rationale_summary": (
                         "El caso aún no tiene un pedido registrado o vinculado. Atención "
                         "recoge los datos de una nueva solicitud o pide vincular el pedido "
@@ -113,6 +116,23 @@ def build_graph(runtime: GraphRuntime, checkpointer):
                     ),
                 }
             )
+        if state.get("retail_draft"):
+            decision = decision.model_copy(update={"process": "P1", "needs_clarification": False})
+        if decision.process in {"P3", "P4"} and not case["order_id"]:
+            decision = decision.model_copy(update={"needs_clarification": True})
+        if decision.process == "P4" and case["order_id"] and case["process"] != "P4":
+            order = await repo.order(actor, str(case["order_id"]))
+            if order["kind"] == "retail_v2":
+                if order["status"] == "QUALITY_PENDING":
+                    decision = decision.model_copy(
+                        update={"process": "P3", "needs_clarification": False}
+                    )
+                else:
+                    decision = decision.model_copy(update={"needs_clarification": True})
+        if decision.process == "P3" and case["order_id"]:
+            order = await repo.order(actor, str(case["order_id"]))
+            if order["kind"] == "retail_v2" and order["status"] != "QUALITY_PENDING":
+                decision = decision.model_copy(update={"needs_clarification": True})
         actor.require(ROLES[decision.process])
         await runtime.emit(
             state,
@@ -130,6 +150,7 @@ def build_graph(runtime: GraphRuntime, checkpointer):
         )
         return {
             "process": decision.process,
+            "needs_clarification": decision.needs_clarification,
             "model_calls": state.get("model_calls", 0)
             + getattr(runtime.provider, "last_call_count", 1),
             "result": {},
@@ -137,6 +158,23 @@ def build_graph(runtime: GraphRuntime, checkpointer):
             "review_decision": {},
             "skip_review": False,
         }
+
+    async def clarify_route(state: CaseState):
+        proposal = {
+            "action": "clarify",
+            "response": "Aclara la operación y su fase: recepción efectiva en mostrador, solicitud previa de recojo, agenda, calidad tras producción o incidencia. Vincula la orden para calidad; para reclamo abre un expediente P4 separado con el formulario de incidencias.",
+            "rationale_summary": "Intención ambigua o fase incompatible; no se preparan escrituras.",
+            "missing_fields": ["intención/fase"],
+            "source_ids": [],
+        }
+        case = await repo.case(actor, state["case_id"])
+        await repo.save_clarification(
+            state["case_id"],
+            state["process"],
+            proposal,
+            case["clarification_count"] >= runtime.settings.max_clarifications,
+        )
+        return {"proposal": proposal, "response": proposal["response"], "skip_review": True}
 
     async def stage(state: CaseState):
         proposal = state["proposal"]
@@ -192,6 +230,13 @@ def build_graph(runtime: GraphRuntime, checkpointer):
                         "sources": proposal.get("sources", []),
                     },
                 )
+        if process == "P1" and proposal["action"] in {"receive", "request_pickup"}:
+            proposal = await runtime.retail.prepare(actor, case, proposal)
+            proposal["response"] = (
+                "Revisa la recepción y el importe calculado antes de confirmar."
+                if proposal["action"] == "receive"
+                else "Revisa la solicitud previa de recojo. No se creará una orden de servicio."
+            )
         if proposal["action"] == "register" and case["order_id"]:
             raise DomainError(
                 "Ya existe un pedido para este caso. Use logística para coordinarlo.",
@@ -428,20 +473,31 @@ def build_graph(runtime: GraphRuntime, checkpointer):
     for process in ROLES:
         graph.add_node(process, specialist_graph(process, runtime))
         graph.add_edge(process, "stage")
+    graph.add_node("clarify", clarify_route)
+    graph.add_edge("clarify", "respond")
     graph.add_node("stage", stage)
     graph.add_node("review", review)
     graph.add_node("execute", execute)
     graph.add_node("respond", respond)
     graph.add_edge(START, "perceive")
     graph.add_edge("perceive", "supervisor")
-    graph.add_conditional_edges("supervisor", lambda s: s["process"], {p: p for p in ROLES})
-    graph.add_conditional_edges("stage", lambda s: "respond" if s["skip_review"] else "review")
+    graph.add_conditional_edges(
+        "supervisor",
+        lambda s: "clarify" if s["needs_clarification"] else s["process"],
+        {**{p: p for p in ROLES}, "clarify": "clarify"},
+    )
+    graph.add_conditional_edges(
+        "stage",
+        lambda s: "respond" if s["skip_review"] else "review",
+        {"respond": "respond", "review": "review"},
+    )
     graph.add_edge("review", "execute")
     graph.add_conditional_edges(
         "execute",
         lambda s: (
             "review" if s.get("human_approval") and not s.get("review_decision") else "respond"
         ),
+        {"review": "review", "respond": "respond"},
     )
     graph.add_edge("respond", END)
     return graph.compile(checkpointer=checkpointer)

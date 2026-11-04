@@ -52,10 +52,10 @@ def specialist_graph(process: str, runtime):
             results["customer"] = await invoke(
                 "customer_registry", {"client_id": results["case"]["client_id"]}
             )
-        if process == "P2" and results["case"]["order_id"]:
-            results["schedule_options"] = await invoke(
-                "schedule_options", {"order_id": str(results["case"]["order_id"])}
-            )
+        if process == "P2" and (
+            results["case"]["order_id"] or results["case"]["pickup_request_id"]
+        ):
+            results["schedule_options"] = await invoke("schedule_options", {})
         runtime.budget(state)
         results["sources"] = await invoke(
             "approved_knowledge", {"query": state["text"] or f"Procedimiento {process}"}
@@ -63,6 +63,8 @@ def specialist_graph(process: str, runtime):
         results["sources"] += await invoke("historical_references", {"query": state["text"]})
         results["today_lima"] = str(runtime.clock.now().date())
         results["latest_user_message"] = state["text"]
+        results["retail_draft"] = state.get("retail_draft", {})
+        results["tariff"] = runtime.retail.tariff() if process == "P1" else {}
         results["pilot_limits"] = {"max_clarifications": runtime.settings.max_clarifications}
         # Limit provider context; original messages remain in PostgreSQL.
         results["messages"] = results["messages"][-30:]
@@ -76,7 +78,19 @@ def specialist_graph(process: str, runtime):
         runtime.budget(state)
         started = time.monotonic()
         await runtime.emit(state, "agent.started", {"agent": process, "status": "interpreting"})
-        proposal = await interpret(runtime.provider, process, state["context"])
+        if process == "P4":
+            from aquaclean.agents.deep_incidents.factory import investigate
+
+            proposal = await investigate(runtime, state)
+        else:
+            proposal = await interpret(runtime.provider, process, state["context"])
+        if process == "P1" and state.get("retail_draft"):
+            draft = state["retail_draft"]
+            proposal.update(
+                action=draft["action"],
+                missing_fields=[],
+                **{k: v for k, v in draft.items() if k != "action"},
+            )
         retrieved = {s["chunk_id"]: s for s in state["context"]["sources"]}
         if not set(proposal.get("source_ids", [])) <= retrieved.keys():
             raise DomainError(

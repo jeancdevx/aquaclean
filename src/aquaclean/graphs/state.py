@@ -18,3 +18,5 @@ class CaseState(TypedDict, total=False):
     review_decision: dict[str, Any]
     model_calls: int
     skip_review: bool
+    needs_clarification: bool
+    retail_draft: dict[str, Any]
