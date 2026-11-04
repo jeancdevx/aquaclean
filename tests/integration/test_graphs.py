@@ -129,7 +129,11 @@ async def test_M08_p2_graph_actual_schedule(rt, case):
     await registered(rt, case["id"])
     await rt.repo.db.execute(
         "INSERT INTO app.slots(id,organization_id,day,shift,capacity) VALUES(%s,%s,%s,'manana',8)",
-        ("TEST-" + str(uuid4()), rt.actor.organization_id, rt.clock.now().date()),
+        (
+            "TEST-" + str(uuid4()),
+            rt.actor.organization_id,
+            rt.clock.now().date() + timedelta(days=1),
+        ),
     )
     rt.provider.process = "P2"
     rt.provider.action = "reserve"
