@@ -21,6 +21,7 @@ import { ConversationSidebar } from "./ConversationSidebar";
 import { MessageList } from "./MessageList";
 import { PromptComposer } from "./PromptComposer";
 import { ActivityPanel } from "./ActivityPanel";
+import { RetailPanel } from "./RetailPanel";
 
 export default function ChatWorkspace() {
   const chat = useChatSession();
@@ -29,7 +30,8 @@ export default function ChatWorkspace() {
     [mobileHistory, setMobileHistory] = useState(false),
     [inspector, setInspector] = useState(false),
     [wide, setWide] = useState(false),
-    [dark, setDark] = useState(false);
+    [dark, setDark] = useState(false),
+    [retailOpen, setRetailOpen] = useState(false);
   useEffect(() => {
     const query = matchMedia("(min-width:1100px)");
     const update = () => setWide(query.matches);
@@ -126,6 +128,7 @@ export default function ChatWorkspace() {
               </span>
             </div>
             <div className="flex items-center gap-1">
+              <Button variant="outline" size="sm" onClick={() => setRetailOpen(true)}>Atención al detalle</Button>
               <span
                 className="hidden lg:inline text-xs muted mr-2 whitespace-nowrap"
                 title={chat.session?.ai.model}
@@ -246,6 +249,16 @@ export default function ChatWorkspace() {
           </div>
         </section>
       </div>
+      <Sheet open={retailOpen} onOpenChange={setRetailOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto p-6">
+          <SheetHeader className="mb-6">
+            <SheetTitle>Recepción y ciclo del servicio</SheetTitle>
+            <SheetDescription>Mostrador, solicitud previa de recojo y tareas declaradas.</SheetDescription>
+          </SheetHeader>
+          <RetailPanel key={chat.caseId || "new"} snapshot={chat.snapshot} session={chat.session} ensureCase={chat.ensureCase}
+            onRun={r => { chat.setActiveRun(r.id); setRetailOpen(false); reload(); }} onSaved={reload} onError={chat.setError} />
+        </SheetContent>
+      </Sheet>
       <Sheet open={mobileHistory} onOpenChange={setMobileHistory}>
         <SheetContent side="left" className="w-[280px] p-0">
           <SheetHeader className="sr-only">

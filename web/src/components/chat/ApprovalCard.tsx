@@ -118,6 +118,14 @@ export function ApprovalCard({
           ))}
         </dl>
       )}
+      {proposal.reception && <div className="space-y-3 my-4">
+        <p><strong>Recepción efectiva · {proposal.reception.channel === "counter" ? "Mostrador" : "Recojo recibido"}</strong></p>
+        <p>Cliente: {proposal.reception.customer.existing_id || proposal.reception.customer.name}</p>
+        <p>{proposal.reception.receipt_evidence}</p>
+        {proposal.reception.items.map((item, i) => <div key={i} className="notice"><strong>{item.quantity} × {item.garment}</strong><p>{({ wash_piece: "Lavado por prenda", wash_kg: "Lavado por kilo", iron_piece: "Planchado por prenda" }[item.service_code] || item.service_code)}{item.weight_kg ? ` · ${item.weight_kg} kg` : ""}</p><p>{item.observations}</p></div>)}
+      </div>}
+      {proposal.quote && <div className="notice my-4"><strong>Importe calculado PEN {proposal.quote.total}</strong><p>Adelanto declarado {proposal.quote.advance} · Saldo {proposal.quote.balance}</p><p>Fecha prometida: {new Date(proposal.quote.promised_at).toLocaleString("es-PE", { timeZone: "America/Lima" })}</p><small>Tarifario sintético {proposal.quote.tariff_version}. Comprobante de demostración sin validez fiscal.</small></div>}
+      {proposal.pickup && <div className="notice my-4"><strong>Solicitud previa de recojo · sin orden de servicio</strong><p>{proposal.pickup.customer.existing_id || proposal.pickup.customer.name}</p><p>{proposal.pickup.address} · {proposal.pickup.day} · {proposal.pickup.shift}</p><p>{proposal.pickup.declared_volume} · {proposal.pickup.contact}</p></div>}
       {proposal.options && (
         <fieldset className="space-y-2">
           <legend className="sr-only">Alternativas disponibles</legend>
