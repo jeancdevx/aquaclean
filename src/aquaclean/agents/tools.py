@@ -25,6 +25,7 @@ def specialist_tools(
                 "orders",
                 "linked_order_history",
                 "command_history",
+                "retail",
             )
         }
 
@@ -35,10 +36,12 @@ def specialist_tools(
         return await repo.customer(actor, client_id)
 
     @tool
-    async def schedule_options(order_id: str) -> list[dict]:
+    async def schedule_options() -> list[dict]:
         """Calculate feasible capacity options from the current persisted agenda."""
         actor.require("logistics")
-        return await repo.slots(actor, order_id)
+        from aquaclean.infrastructure.persistence.retail_logistics import options
+
+        return await options(repo, actor, case_id)
 
     @tool
     async def approved_knowledge(query: str) -> list[dict]:
