@@ -1,3 +1,5 @@
+> Antecedente V1 corporativo, superado para el alcance seleccionado. Versión vigente: [descripciones V2](../DESCRIPCIONES_PROCESOS.md). Original conservado en [antecedentes](../antecedentes/v1/descripciones/02-solicitudes.md).
+
 # P1. Interpretar y registrar solicitudes de recojo
 
 **Diagrama:** `bpmn/02-to-be-solicitudes.bpmn`. **Proceso:** `Process_P1`. **Especialista:** agente de atención. **Reutilización:** servicio determinista `registrar_recojo` del RPA existente.
